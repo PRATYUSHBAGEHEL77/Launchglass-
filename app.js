@@ -43,6 +43,8 @@ function setAuthenticatedUI(user) {
     loadWorkspace();
     loadPublicCampaigns();
     loadMyProfile();
+    loadManufacturerDirectory();
+    loadManufacturingPortal();
     checkAdmin();
   }
 }
@@ -373,12 +375,100 @@ $('exportMyData')?.addEventListener('click',async()=>{
   }catch(e){notify('Export failed: '+e.message);}
 });
 
+
+// PHASE 3 — Manufacturer portal: verified directory, partner applications,
+// creator RFQs and manufacturer quotations. All writes use Supabase RLS.
+function showMfgResult(id,text){const el=$(id);if(el){el.textContent=text;el.classList.add('show');}}
+async function loadManufacturerDirectory(){
+ const box=$('manufacturerDirectory');if(!box||!supabase)return;
+ box.innerHTML='<p class="mono">Loading verified partners…</p>';
+ try{
+  const {data,error}=await supabase.from('manufacturer_profiles')
+   .select('id,user_id,business_name,location,categories,capabilities,minimum_order_quantity,website,created_at')
+   .eq('status','verified').order('created_at',{ascending:false}).limit(100);
+  if(error)throw error;
+  const q=($('manufacturerSearch')?.value||'').trim().toLowerCase();
+  const rows=(data||[]).filter(x=>!q||[x.business_name,x.location,x.categories,x.capabilities].some(v=>String(v||'').toLowerCase().includes(q)));
+  box.innerHTML=rows.length?rows.map(x=>`<article class="manufacturerCard"><h4>${escapeHTML(x.business_name)}</h4><div class="manufacturerMeta"><span>VERIFIED LISTING</span><span>${escapeHTML(x.location)}</span><span>MOQ ${Number(x.minimum_order_quantity||1).toLocaleString('en-IN')}</span></div><p><b>Categories:</b> ${escapeHTML(x.categories)}</p><p>${escapeHTML(x.capabilities)}</p>${x.website?`<p><a href="${escapeHTML(x.website)}" target="_blank" rel="noopener noreferrer">Business website</a></p>`:''}<button class="btn" type="button" data-contact-mfg="${x.id}">Request a quote</button></article>`).join(''):'<p class="mono">No verified manufacturers are listed yet. Business applications remain private until owner review.</p>';
+  box.querySelectorAll('[data-contact-mfg]').forEach(b=>b.addEventListener('click',()=>{const select=$('mfgRequestCategory');if(select)select.focus();$('mfgRequestDescription').focus();notify('Complete the quotation request below. Verified partners can respond to open requests.');}));
+ }catch(e){box.innerHTML=`<p class="mono">Directory unavailable: ${escapeHTML(e.message)}</p>`;}
+}
+async function loadMyManufacturerProfile(){
+ if(!supabase||!currentUser)return;
+ const {data,error}=await supabase.from('manufacturer_profiles').select('*').eq('user_id',currentUser.id).maybeSingle();
+ if(error){console.warn('Manufacturer profile:',error.message);return;}
+ if(!data)return;
+ $('mfgBusinessName').value=data.business_name||'';$('mfgLocation').value=data.location||'';
+ $('mfgCategories').value=data.categories||'';$('mfgMoq').value=data.minimum_order_quantity||'';
+ $('mfgCapabilities').value=data.capabilities||'';$('mfgWebsite').value=data.website||'';
+ showMfgResult('manufacturerProfileStatus',`Application status: ${data.status}. ${data.review_note||'Your listing is not public until verified.'}`);
+}
+$('saveManufacturerProfile')?.addEventListener('click',async()=>{
+ if(!(await requireClient()))return;
+ const business_name=$('mfgBusinessName').value.trim(),location=$('mfgLocation').value.trim(),categories=$('mfgCategories').value.trim(),capabilities=$('mfgCapabilities').value.trim(),minimum_order_quantity=Number($('mfgMoq').value),raw=$('mfgWebsite').value.trim();
+ if(business_name.length<2||location.length<2||categories.length<2||capabilities.length<40||!Number.isInteger(minimum_order_quantity)||minimum_order_quantity<1){showMfgResult('manufacturerProfileStatus','Complete business name, location, categories, at least 40 characters of capabilities and a valid MOQ.');return;}
+ let website=null;if(raw){try{const u=new URL(raw);if(!['https:','http:'].includes(u.protocol))throw 0;website=u.href;}catch{showMfgResult('manufacturerProfileStatus','Enter a valid website URL.');return;}}
+ const b=$('saveManufacturerProfile');setBusy(b,true,'Submitting…');
+ try{
+  const payload={user_id:currentUser.id,business_name,location,categories,capabilities,minimum_order_quantity,website,status:'pending'};
+  const {error}=await supabase.from('manufacturer_profiles').upsert(payload,{onConflict:'user_id'});
+  if(error)throw error;
+  showMfgResult('manufacturerProfileStatus','Business profile submitted. It is private and awaiting owner verification.');notify('Manufacturer application submitted for review.');
+ }catch(e){showMfgResult('manufacturerProfileStatus','Could not submit: '+e.message);}
+ finally{setBusy(b,false);}
+});
+$('createMfgRequest')?.addEventListener('click',async()=>{
+ if(!(await requireClient()))return;
+ const campaign_id=$('mfgRequestCampaign').value||null,category=$('mfgRequestCategory').value,quantity=Number($('mfgRequestQuantity').value),needed_by=$('mfgRequestDeadline').value||null,description=$('mfgRequestDescription').value.trim();
+ if(!category||!Number.isInteger(quantity)||quantity<1||description.length<40){showMfgResult('mfgRequestStatus','Choose a category, enter a positive quantity and describe the requirements in at least 40 characters.');return;}
+ const b=$('createMfgRequest');setBusy(b,true,'Sending request…');
+ try{const {error}=await supabase.from('manufacturing_requests').insert({creator_id:currentUser.id,campaign_id,category,quantity,needed_by,description});
+  if(error)throw error;showMfgResult('mfgRequestStatus','Quotation request created. Verified manufacturers can now review it.');$('mfgRequestDescription').value='';await loadManufacturingPortal();notify('Manufacturing request saved.');
+ }catch(e){showMfgResult('mfgRequestStatus','Could not create request: '+e.message);}
+ finally{setBusy(b,false);}
+});
+async function loadManufacturingPortal(){
+ if(!supabase||!currentUser)return;
+ await loadMyManufacturerProfile();
+ const {data:campaigns,error:ce}=await supabase.from('campaigns').select('id,name').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(50);
+ if(!ce){$('mfgRequestCampaign').innerHTML='<option value="">No linked campaign</option>'+(campaigns||[]).map(c=>`<option value="${c.id}">${escapeHTML(c.name)}</option>`).join('');}
+ const {data:profile}=await supabase.from('manufacturer_profiles').select('status').eq('user_id',currentUser.id).maybeSingle();
+ const isVerified=profile?.status==='verified';
+ const reqBox=$('mfgRequestsList');
+ try{
+  let query=supabase.from('manufacturing_requests').select('id,creator_id,campaign_id,category,quantity,needed_by,description,status,created_at').eq('status','open').order('created_at',{ascending:false}).limit(100);
+  const {data,error}=await query;if(error)throw error;
+  const requests=(data||[]).filter(r=>r.creator_id===currentUser.id||isVerified);
+  reqBox.innerHTML=requests.length?requests.map(r=>`<article class="manufacturerCard"><h4>${escapeHTML(r.category)} · ${Number(r.quantity).toLocaleString('en-IN')} units</h4><div class="manufacturerMeta"><span>${r.creator_id===currentUser.id?'YOUR REQUEST':'OPEN RFQ'}</span><span>${new Date(r.created_at).toLocaleDateString('en-IN')}</span>${r.needed_by?`<span>NEEDED BY ${escapeHTML(r.needed_by)}</span>`:''}</div><p>${escapeHTML(r.description)}</p>${isVerified&&r.creator_id!==currentUser.id?`<button class="btn primary" data-quote-request="${r.id}">Submit quotation</button>`:''}</article>`).join(''):'<p class="mono">${isVerified?'No open quotation requests yet.':'Your requests appear here. Only verified manufacturers can view other creators’ open requests.'}</p>';
+  reqBox.querySelectorAll('[data-quote-request]').forEach(b=>b.addEventListener('click',()=>openQuoteForm(b.dataset.quoteRequest)));
+ }catch(e){reqBox.innerHTML=`<p class="mono">Requests unavailable: ${escapeHTML(e.message)}</p>`;}
+ const {data:mine,error:me}=await supabase.from('manufacturing_requests').select('id,category,quantity,status,created_at').eq('creator_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
+ const {data:quotes,error:qe}=await supabase.from('manufacturing_quotes').select('id,request_id,manufacturer_id,price_per_unit,currency,lead_time_days,notes,status,created_at').eq('manufacturer_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
+ if(me||qe){$('myMfgActivity').textContent='Activity could not load: '+(me||qe).message;return;}
+ $('myMfgActivity').innerHTML=[...(mine||[]).map(x=>`<div class="workspaceItem"><div><strong>Request · ${escapeHTML(x.category)}</strong><small>${Number(x.quantity)} units · ${escapeHTML(x.status)} · ${new Date(x.created_at).toLocaleDateString()}</small></div></div>`),...(quotes||[]).map(x=>`<div class="workspaceItem"><div><strong>Quotation · ${escapeHTML(x.currency)} ${Number(x.price_per_unit).toLocaleString('en-IN')} / unit</strong><small>${Number(x.lead_time_days)} days · ${escapeHTML(x.status)} · ${escapeHTML(x.notes||'')}</small></div></div>`)].join('')||'<p class="mono">No manufacturing activity yet.</p>';
+}
+function openQuoteForm(requestId){
+ const price=prompt('Your quoted price per unit (numbers only):');if(price===null)return;
+ const lead=prompt('Estimated lead time in days:');if(lead===null)return;
+ const notes=prompt('Quote notes, exclusions and assumptions:')||'';
+ submitManufacturingQuote(requestId,Number(price),Number(lead),notes);
+}
+async function submitManufacturingQuote(request_id,price_per_unit,lead_time_days,notes){
+ if(!(await requireClient()))return;
+ if(!Number.isFinite(price_per_unit)||price_per_unit<=0||!Number.isInteger(lead_time_days)||lead_time_days<1){notify('Enter a valid positive unit price and lead time.');return;}
+ try{const {error}=await supabase.from('manufacturing_quotes').insert({request_id,manufacturer_id:currentUser.id,price_per_unit,currency:'INR',lead_time_days,notes:String(notes).slice(0,1500)});if(error)throw error;notify('Quotation submitted to the creator.');await loadManufacturingPortal();}
+ catch(e){notify('Quote failed: '+e.message);}
+}
+$('refreshManufacturers')?.addEventListener('click',loadManufacturerDirectory);
+$('manufacturerSearch')?.addEventListener('input',loadManufacturerDirectory);
+$('refreshMfgRequests')?.addEventListener('click',loadManufacturingPortal);
+
 // Route dashboard role tabs to their real working areas; hide admin access for non-owners.
 document.querySelectorAll('.roleTab').forEach(button=>button.addEventListener('click',()=>{
   const role=button.dataset.role;
   if(role==='creator'){location.hash='#my-workspace';}
   if(role==='backer'){location.hash='#product-discovery';}
-  if(role==='manufacturer'){$('leadType').value='manufacturer';window.openModal?.('manufacturer');}
+  if(role==='manufacturer'){location.hash='#manufacturing';loadManufacturingPortal();}
   if(role==='admin'){
     if($('owner-console').hidden){notify('Owner access only.');return;}
     location.hash='#owner-console';

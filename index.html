@@ -1160,6 +1160,11 @@ textarea.inputField{min-height:110px;resize:vertical}
 .campaignDetailClose{float:right;margin-left:10px}
 @media(max-width:760px){.discoveryControls{grid-template-columns:1fr}.campaignDetailInner{padding:18px}}
 
+
+.manufacturerCard{padding:16px;border:1px solid var(--line);border-radius:15px;background:var(--surface2);margin:10px 0}
+.manufacturerCard h4{margin:0 0 7px;font-size:15px}.manufacturerCard p{color:var(--muted);font-size:11px;line-height:1.7;margin:7px 0}
+.manufacturerMeta{display:flex;gap:8px;flex-wrap:wrap;font:9px 'DM Mono';color:var(--accent);margin:8px 0}
+
 </style>
 </head>
 
@@ -1791,6 +1796,54 @@ textarea.inputField{min-height:110px;resize:vertical}
   <div class="infoCard"><div class="infoIcon">🏭</div><h3>For manufacturers</h3><ul><li>Register a business profile.</li><li>List capabilities, equipment and specializations.</li><li>Upload portfolio and prior work.</li><li>Receive partnership requests and send quotations.</li><li>Coordinate projects and publish progress.</li></ul></div>
  </div>
  <div class="tableWrap" style="margin-top:18px"><table class="dataTable"><thead><tr><th>Example partner listing</th><th>Capability</th><th>Review status</th><th>Next action</th></tr></thead><tbody><tr><td>Electronics production partner</td><td>PCB assembly, enclosure integration</td><td>Illustrative listing</td><td>Request quotation</td></tr><tr><td>Bag & textile workshop</td><td>Cutting, stitching, custom compartments</td><td>Illustrative listing</td><td>View capabilities</td></tr><tr><td>Packaging supplier</td><td>Retail and shipping packaging</td><td>Illustrative listing</td><td>Contact partner</td></tr></tbody></table></div>
+
+ <div class="workspacePanel" id="manufacturer-registration">
+  <div class="panelTop"><h3>Manufacturer / production partner registration</h3><span class="statusPill">Review required</span></div>
+  <p class="mono">Register your business capabilities. Your listing stays private until an owner verifies it.</p>
+  <div class="grid2">
+   <input class="inputField" id="mfgBusinessName" maxlength="140" placeholder="Business / workshop name">
+   <input class="inputField" id="mfgLocation" maxlength="140" placeholder="City, state, country">
+  </div>
+  <div class="grid2">
+   <input class="inputField" id="mfgCategories" maxlength="240" placeholder="Categories (e.g. electronics, textiles)">
+   <input class="inputField" id="mfgMoq" type="number" min="1" max="1000000" placeholder="Minimum order quantity">
+  </div>
+  <textarea class="inputField" id="mfgCapabilities" maxlength="3000" placeholder="Describe equipment, capabilities, materials and production services (at least 40 characters)"></textarea>
+  <input class="inputField" id="mfgWebsite" type="url" placeholder="Business website (optional, https://...)">
+  <button class="btn primary" id="saveManufacturerProfile" type="button">Submit business profile for review</button>
+  <div class="resultBox" id="manufacturerProfileStatus"></div>
+ </div>
+
+ <div class="workspacePanel">
+  <div class="panelTop"><h3>Verified production partners</h3><button class="btn" id="refreshManufacturers" type="button">Refresh</button></div>
+  <input class="inputField" id="manufacturerSearch" placeholder="Search business, location or capability">
+  <div id="manufacturerDirectory" class="workspaceList"><p class="mono">Loading verified partners…</p></div>
+ </div>
+
+ <div class="workspacePanel">
+  <h3>Request a manufacturing quotation</h3>
+  <p class="mono">Send a scoped request to verified partners. Do not include confidential designs or personal identity documents.</p>
+  <select class="inputField" id="mfgRequestCampaign"><option value="">Select one of your campaigns (optional)</option></select>
+  <select class="inputField" id="mfgRequestCategory"><option value="">Choose manufacturing category</option><option>Electronics</option><option>Textiles</option><option>Plastic / moulding</option><option>Metal fabrication</option><option>Packaging</option><option>Wood / furniture</option><option>Other</option></select>
+  <div class="grid2">
+   <input class="inputField" id="mfgRequestQuantity" type="number" min="1" max="1000000" placeholder="Estimated quantity">
+   <input class="inputField" id="mfgRequestDeadline" type="date">
+  </div>
+  <textarea class="inputField" id="mfgRequestDescription" maxlength="4000" placeholder="Specifications, materials, quality requirements and what you want quoted (at least 40 characters)"></textarea>
+  <button class="btn primary" id="createMfgRequest" type="button">Send quotation request</button>
+  <div class="resultBox" id="mfgRequestStatus"></div>
+ </div>
+
+ <div class="workspacePanel">
+  <div class="panelTop"><h3>Open quotation requests</h3><button class="btn" id="refreshMfgRequests" type="button">Refresh</button></div>
+  <div id="mfgRequestsList" class="workspaceList"><p class="mono">Sign in to view requests available to your account.</p></div>
+ </div>
+
+ <div class="workspacePanel">
+  <h3>My quotations & requests</h3>
+  <div id="myMfgActivity" class="workspaceList"><p class="mono">Your manufacturing activity will appear here.</p></div>
+ </div>
+
  <div class="disclaimer">Any “verified” or “reviewed” badge must be backed by a documented verification process. A listing or verification check does not guarantee quality, delivery, solvency or project success.</div>
 </section>
 
