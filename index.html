@@ -1,0 +1,2226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#100d1b">
+<title>Launchglass — From Idea to Reality</title>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Great+Vibes&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg:#100d1b;
+  --surface:rgba(255,255,255,.075);
+  --surface2:rgba(255,255,255,.12);
+  --text:#f8f5ff;
+  --muted:#b8b1c8;
+  --line:rgba(255,255,255,.16);
+  --accent:#c3a0ff;
+  --accent2:#7fc9ff;
+  --shadow:0 22px 70px rgba(0,0,0,.28);
+  --heroGlow:rgba(155,111,255,.2);
+}
+
+body.light {
+  --bg:#f4f0fa;
+  --surface:rgba(255,255,255,.62);
+  --surface2:rgba(255,255,255,.86);
+  --text:#211833;
+  --muted:#6f667f;
+  --line:rgba(52,35,79,.15);
+  --accent:#8155c8;
+  --accent2:#3987c9;
+  --shadow:0 22px 70px rgba(57,35,88,.12);
+  --heroGlow:rgba(168,128,226,.19);
+}
+
+* {
+  box-sizing:border-box;
+}
+
+html {
+  scroll-behavior:smooth;
+}
+
+body {
+  margin:0;
+  background:
+    radial-gradient(ellipse at 12% 8%,var(--heroGlow),transparent 34%),
+    radial-gradient(ellipse at 90% 26%,rgba(69,150,205,.13),transparent 32%),
+    var(--bg);
+  color:var(--text);
+  font-family:Manrope,Arial,sans-serif;
+  transition:background .35s,color .35s;
+  overflow-x:hidden;
+}
+
+a {
+  color:inherit;
+  text-decoration:none;
+}
+
+button {
+  font:inherit;
+  cursor:pointer;
+  color:inherit;
+}
+
+.wrap {
+  width:min(1160px,calc(100% - 42px));
+  margin:auto;
+}
+
+.script {
+  font-family:'Great Vibes',cursive;
+  font-weight:400;
+}
+
+.mono {
+  font:10px 'DM Mono',monospace;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  color:var(--accent);
+}
+
+/* NAVIGATION */
+
+.nav {
+  position:sticky;
+  top:12px;
+  z-index:30;
+  width:min(1160px,calc(100% - 24px));
+  margin:12px auto 0;
+  padding:12px 15px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:var(--surface);
+  backdrop-filter:blur(24px);
+  box-shadow:var(--shadow);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.brand {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:17px;
+  font-weight:800;
+  letter-spacing:-.06em;
+}
+
+.mark {
+  width:30px;
+  height:30px;
+  border-radius:10px;
+  display:grid;
+  place-items:center;
+  color:#211333;
+  background:linear-gradient(135deg,#d7b9ff,#78c9ff);
+}
+
+.links {
+  display:flex;
+  gap:25px;
+  font-size:11px;
+  font-weight:700;
+  color:var(--muted);
+}
+
+.links a:hover {
+  color:var(--accent);
+}
+
+.navActions {
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+
+.btn {
+  border:1px solid var(--line);
+  background:var(--surface);
+  padding:11px 15px;
+  border-radius:12px;
+  font-size:11px;
+  font-weight:800;
+  transition:.25s;
+}
+
+.btn:hover {
+  transform:translateY(-2px);
+  background:var(--surface2);
+}
+
+.primary {
+  background:linear-gradient(110deg,#c5a1ff,#86bfff);
+  border:0;
+  color:#1b1230;
+}
+
+/* THANOS SNAP THEME TOGGLE */
+.snapToggle{
+  position:relative;width:40px;height:40px;flex:0 0 40px;
+  border:1px solid rgba(214,176,255,.38);border-radius:50%;
+  overflow:hidden;background:radial-gradient(circle at 50% 35%,#49305f,#120d1c 72%);
+  box-shadow:0 0 24px rgba(164,108,235,.25),inset 0 0 18px #ffffff12;
+  cursor:pointer;touch-action:manipulation;padding:0;
+  transition:transform .25s,border-color .25s,box-shadow .25s;
+}
+.snapToggle:hover{transform:scale(1.08);border-color:#d8b6ff;box-shadow:0 0 34px #a66bea88}
+.snapToggle canvas,.snapToggle svg{display:block;width:100%;height:100%;padding:3px;margin:auto;pointer-events:none;overflow:visible}
+.snapHand{transform-origin:50% 50%;filter:drop-shadow(0 2px 3px #0009)}
+.snapFingerGroup{transform-origin:56px 38px;transition:transform .18s ease}
+.snapThumb{transform-origin:42px 54px;transition:transform .18s ease}
+.snapToggle.snapping .snapFingerGroup{animation:fingerSnap .48s cubic-bezier(.2,.8,.2,1)}
+.snapToggle.snapping .snapThumb{animation:thumbSnap .48s cubic-bezier(.2,.8,.2,1)}
+@keyframes fingerSnap{0%,100%{transform:rotate(0)}45%{transform:rotate(-24deg)}70%{transform:rotate(5deg)}}
+@keyframes thumbSnap{0%,100%{transform:rotate(0)}45%{transform:rotate(34deg)}70%{transform:rotate(-7deg)}}
+.snapToggle.snapping{animation:snapImpact .55s ease}
+@keyframes snapImpact{0%{transform:scale(1)}28%{transform:scale(1.16) rotate(-5deg)}55%{transform:scale(.92) rotate(4deg)}100%{transform:scale(1)}}
+.snapToggle:after{content:"";position:absolute;inset:-20%;border-radius:50%;border:2px solid #e8c477;opacity:0;pointer-events:none}
+.snapToggle.snapping:after{animation:snapRing .8s ease-out}
+@keyframes snapRing{0%{transform:scale(.35);opacity:.9}100%{transform:scale(1.5);opacity:0}}
+@media(max-width:700px){.snapToggle{width:36px;height:36px;flex-basis:36px;border-radius:11px}.snapToggle:hover{transform:scale(1.03)}}
+.navActions{flex-shrink:0}
+.snapToggle:focus-visible{outline:2px solid #e8c477;outline-offset:3px}
+/* HERO */
+
+.hero {
+  min-height:650px;
+  padding:100px 0 75px;
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:42px;
+  align-items:center;
+}
+
+.pill {
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  padding:8px 12px;
+  border:1px solid var(--line);
+  border-radius:99px;
+  background:var(--surface);
+  font:9px 'DM Mono';
+  letter-spacing:.12em;
+  color:var(--accent);
+}
+
+.live {
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#80e3b7;
+  box-shadow:0 0 12px #80e3b7;
+}
+
+h1 {
+  font-size:clamp(48px,6.5vw,82px);
+  line-height:.98;
+  letter-spacing:-.075em;
+  margin:24px 0 15px;
+  font-weight:800;
+}
+
+h1 .script {
+  display:inline-block;
+  font-size:1.22em;
+  line-height:.8;
+  background:linear-gradient(100deg,var(--accent),var(--accent2));
+  background-clip:text;
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.hero p {
+  max-width:500px;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.9;
+}
+
+.actions {
+  display:flex;
+  gap:11px;
+  margin-top:26px;
+  flex-wrap:wrap;
+}
+
+.note {
+  margin-top:23px;
+  font:9px 'DM Mono';
+  color:var(--muted);
+  letter-spacing:.1em;
+}
+
+/* 360 DEGREE INTERACTIVE CARD */
+
+.stage {
+  height:450px;
+  position:relative;
+  display:grid;
+  place-items:center;
+  perspective:1200px;
+  overflow:visible;
+}
+
+.halo {
+  position:absolute;
+  width:340px;
+  height:340px;
+  border-radius:50%;
+  background:radial-gradient(
+    circle at 32% 25%,
+    #eadcff,
+    #9b75e5 24%,
+    #4a3c88 56%,
+    transparent 72%
+  );
+  filter:drop-shadow(0 0 65px #9870df66);
+  animation:bob 7s ease-in-out infinite;
+}
+
+@keyframes bob {
+  50% {
+    transform:translateY(-15px);
+  }
+}
+
+.glassPanel {
+  position:relative;
+  width:min(390px,90%);
+  min-height:250px;
+  padding:25px;
+  border-radius:25px;
+  border:1px solid #ffffff65;
+  background:linear-gradient(
+    135deg,
+    rgba(255,255,255,.3),
+    rgba(255,255,255,.07)
+  );
+  backdrop-filter:blur(25px);
+  box-shadow:
+    0 35px 90px #0006,
+    inset 0 1px 1px #ffffff80;
+
+  transform-style:preserve-3d;
+  will-change:transform;
+  transition:transform .08s linear;
+  cursor:grab;
+}
+
+.light .glassPanel {
+  background:linear-gradient(
+    135deg,
+    #ffffffb8,
+    #ffffff45
+  );
+  border-color:#ffffffd9;
+}
+
+.panelTop,
+.panelBottom {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.gem {
+  width:38px;
+  height:30px;
+  border-radius:8px;
+  background:linear-gradient(135deg,#f8e5b8,#a99dbb);
+}
+
+.panelBig {
+  font:28px 'Great Vibes';
+  margin:42px 0 29px;
+}
+
+.panelBottom small {
+  display:block;
+  font:8px 'DM Mono';
+  color:var(--muted);
+  letter-spacing:.13em;
+}
+
+.panelBottom strong {
+  font-size:12px;
+}
+
+.floating {
+  position:absolute;
+  padding:13px 15px;
+  border:1px solid var(--line);
+  border-radius:15px;
+  background:var(--surface);
+  backdrop-filter:blur(20px);
+  box-shadow:var(--shadow);
+}
+
+.floating small {
+  display:block;
+  color:var(--muted);
+  font:8px 'DM Mono';
+  text-transform:uppercase;
+}
+
+.floating strong {
+  display:block;
+  font-size:17px;
+  margin-top:5px;
+}
+
+.fA {
+  left:-2px;
+  top:55px;
+  transform:rotate(-5deg);
+}
+
+.fB {
+  right:-3px;
+  bottom:52px;
+  transform:rotate(5deg);
+}
+
+.fB strong {
+  color:#65d8a8;
+}
+
+/* SECTIONS */
+
+.section {
+  padding:72px 0;
+}
+
+.sectionHead {
+  display:flex;
+  justify-content:space-between;
+  align-items:end;
+  gap:20px;
+  margin-bottom:28px;
+}
+
+.sectionHead h2 {
+  font-size:clamp(30px,4vw,47px);
+  line-height:1.04;
+  letter-spacing:-.065em;
+  margin:9px 0 0;
+}
+
+.sectionHead h2 .script {
+  font-size:1.35em;
+  color:var(--accent);
+}
+
+.sectionHead p {
+  max-width:350px;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.8;
+}
+
+.glass {
+  border:1px solid var(--line);
+  background:var(--surface);
+  backdrop-filter:blur(22px);
+  box-shadow:var(--shadow);
+}
+
+/* STATS */
+
+.stats {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+.stat {
+  border-radius:17px;
+  padding:20px;
+}
+
+.stat b {
+  font-size:25px;
+  letter-spacing:-.06em;
+}
+
+.stat span {
+  display:block;
+  font-size:10px;
+  color:var(--muted);
+  margin-top:5px;
+}
+
+/* CAMPAIGNS */
+
+.campaigns {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+
+.campaign {
+  border-radius:20px;
+  overflow:hidden;
+  transition:.3s;
+}
+
+.campaign:hover {
+  transform:translateY(-6px);
+}
+
+.art {
+  height:175px;
+  display:grid;
+  place-items:center;
+  position:relative;
+  overflow:hidden;
+}
+
+.art:before {
+  content:"";
+  position:absolute;
+  width:145px;
+  height:145px;
+  border-radius:50%;
+  background:radial-gradient(
+    circle at 30% 25%,
+    #e7d7ff,
+    #8e65d6 55%,
+    #46327e
+  );
+  box-shadow:0 0 55px #a17bea66;
+}
+
+.art.one {
+  background:linear-gradient(135deg,#38265b,#1c345c);
+}
+
+.art.two {
+  background:linear-gradient(135deg,#174e55,#1c3047);
+}
+
+.art.two:before {
+  border-radius:28px;
+  background:linear-gradient(135deg,#c6ffe8,#3bbba8 55%,#16747a);
+  transform:rotate(25deg);
+}
+
+.art.three {
+  background:linear-gradient(135deg,#60344e,#342b5a);
+}
+
+.art.three:before {
+  background:radial-gradient(
+    circle at 30% 25%,
+    #ffe0ef,
+    #d46cae 55%,
+    #793e9e
+  );
+}
+
+.product {
+  z-index:1;
+  font-size:60px;
+  filter:drop-shadow(0 15px 20px #0006);
+}
+
+.tag {
+  position:absolute;
+  top:12px;
+  left:12px;
+  border:1px solid #ffffff55;
+  background:#140f2c88;
+  border-radius:99px;
+  padding:6px 9px;
+  color:white;
+  font:8px 'DM Mono';
+}
+
+.campaignBody {
+  padding:17px;
+}
+
+.campaignBody h3 {
+  font-size:15px;
+  margin:0 0 7px;
+}
+
+.campaignBody p {
+  font-size:10px;
+  line-height:1.7;
+  color:var(--muted);
+  min-height:35px;
+}
+
+.fund {
+  display:flex;
+  justify-content:space-between;
+  font-size:10px;
+}
+
+.bar {
+  height:5px;
+  border-radius:99px;
+  background:var(--line);
+  margin:9px 0 12px;
+  overflow:hidden;
+}
+
+.bar i {
+  height:100%;
+  display:block;
+  background:linear-gradient(90deg,#ae84f1,#79c7ff);
+}
+
+.campaignMeta {
+  display:flex;
+  justify-content:space-between;
+  color:var(--muted);
+  font-size:9px;
+}
+
+/* FEATURES */
+
+.features {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.feature {
+  min-height:260px;
+  padding:27px;
+  border-radius:21px;
+  position:relative;
+  overflow:hidden;
+}
+
+.featureIcon {
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  border-radius:13px;
+  background:#aa83ed28;
+  border:1px solid #bd9cff66;
+  font-size:19px;
+}
+
+.feature h3 {
+  font-size:24px;
+  letter-spacing:-.06em;
+  margin:18px 0 8px;
+}
+
+.feature p {
+  max-width:390px;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.8;
+}
+
+.feature .script {
+  font-size:1.55em;
+  color:var(--accent);
+}
+
+.orbSmall {
+  position:absolute;
+  width:160px;
+  height:160px;
+  right:-20px;
+  bottom:-65px;
+  border-radius:50%;
+  background:radial-gradient(
+    circle at 30% 25%,
+    #e7d5ff,
+    #956cdd 45%,
+    transparent 72%
+  );
+  filter:drop-shadow(0 0 40px #9870df66);
+}
+
+/* CALCULATOR */
+
+.calc {
+  border-radius:22px;
+  padding:25px;
+  display:grid;
+  grid-template-columns:1fr .8fr;
+  gap:25px;
+}
+
+.controls label {
+  display:flex;
+  justify-content:space-between;
+  color:var(--muted);
+  font-size:10px;
+  margin:16px 0 9px;
+}
+
+.controls input {
+  width:100%;
+  accent-color:#a981e8;
+}
+
+.toggleRow {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:var(--muted);
+  font-size:10px;
+  margin-top:17px;
+}
+
+.toggleMini {
+  width:40px;
+  height:22px;
+  border-radius:99px;
+  background:#9870d1;
+  position:relative;
+  cursor:pointer;
+}
+
+.toggleMini:after {
+  content:"";
+  position:absolute;
+  width:14px;
+  height:14px;
+  top:4px;
+  left:22px;
+  border-radius:50%;
+  background:white;
+  transition:.2s;
+}
+
+.toggleMini.off {
+  background:#777;
+}
+
+.toggleMini.off:after {
+  left:4px;
+}
+
+.total {
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:22px;
+  background:linear-gradient(140deg,#a77cff25,#69baff12);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+.total small {
+  font:9px 'DM Mono';
+  color:var(--accent);
+}
+
+.total strong {
+  font-size:38px;
+  letter-spacing:-.07em;
+}
+
+.total p {
+  font-size:9px;
+  line-height:1.7;
+  color:var(--muted);
+}
+
+/* STEPS */
+
+.steps {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+.step {
+  padding:20px;
+  border-radius:17px;
+}
+
+.step b {
+  font:9px 'DM Mono';
+  color:var(--accent);
+}
+
+.step h3 {
+  font-size:17px;
+  margin:17px 0 8px;
+}
+
+.step p {
+  font-size:10px;
+  color:var(--muted);
+  line-height:1.8;
+}
+
+/* CALL TO ACTION */
+
+.cta {
+  border-radius:25px;
+  padding:45px;
+  text-align:center;
+}
+
+.cta h2 {
+  font-size:clamp(30px,5vw,54px);
+  letter-spacing:-.06em;
+  margin:14px 0;
+}
+
+.cta h2 .script {
+  color:var(--accent);
+}
+
+.cta p {
+  max-width:520px;
+  margin:0 auto 22px;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.8;
+}
+
+/* FOOTER */
+
+footer {
+  padding:25px 0 35px;
+}
+
+.footer {
+  border-top:1px solid var(--line);
+  padding-top:20px;
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  flex-wrap:wrap;
+  color:var(--muted);
+  font-size:9px;
+}
+
+.creatorCredit {
+  color:var(--muted);
+  white-space:nowrap;
+}
+.creatorCredit a {
+  color:var(--accent);
+  font-weight:800;
+  text-decoration:none;
+  border-bottom:1px solid color-mix(in srgb,var(--accent) 55%,transparent);
+  transition:color .2s ease,border-color .2s ease,text-shadow .2s ease;
+}
+.creatorCredit a:hover,
+.creatorCredit a:focus-visible {
+  color:var(--accent2);
+  border-color:var(--accent2);
+  text-shadow:0 0 14px color-mix(in srgb,var(--accent2) 45%,transparent);
+  outline:none;
+}
+
+/* MODAL */
+
+.modal {
+  position:fixed;
+  inset:0;
+  background:#090611bb;
+  backdrop-filter:blur(10px);
+  z-index:80;
+  display:none;
+  place-items:center;
+  padding:20px;
+}
+
+.modal.show {
+  display:grid;
+}
+
+.modalBox {
+  width:min(430px,100%);
+  padding:28px;
+  border-radius:22px;
+  position:relative;
+}
+
+.modalBox h3 {
+  font-size:25px;
+  margin:12px 0;
+}
+
+.modalBox p {
+  font-size:11px;
+  color:var(--muted);
+  line-height:1.8;
+}
+
+.modalBox input,
+.modalBox select {
+  width:100%;
+  padding:13px;
+  margin:7px 0;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--text);
+}
+
+.close {
+  position:absolute;
+  right:18px;
+  top:14px;
+  background:none;
+  border:0;
+  font-size:25px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:800px) {
+  .links {
+    display:none;
+  }
+
+  .hero {
+    grid-template-columns:1fr;
+    padding-top:65px;
+  }
+
+  .stage {
+    height:360px;
+  }
+
+  .stats {
+    grid-template-columns:1fr 1fr;
+  }
+
+  .campaigns {
+    grid-template-columns:1fr 1fr;
+  }
+
+  .steps {
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+@media(max-width:560px) {
+  .wrap {
+    width:calc(100% - 28px);
+  }
+
+  .section {
+    padding:48px 0;
+  }
+
+  .sectionHead {
+    display:block;
+  }
+
+  .sectionHead p {
+    margin-top:12px;
+  }
+
+  .campaigns,
+  .features,
+  .calc,
+  .steps {
+    grid-template-columns:1fr;
+  }
+
+  .stats {
+    grid-template-columns:1fr 1fr;
+  }
+
+  .cta {
+    padding:30px 18px;
+  }
+
+  .footer {
+    display:grid;
+  }
+}
+
+/* ---- motion layer ---- */
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,[role=button]:focus-visible,[role=switch]:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.progress{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));transform-origin:left;transform:scaleX(0);z-index:90}
+.cursor{position:fixed;left:0;top:0;width:560px;height:560px;margin:-280px 0 0 -280px;border-radius:50%;background:radial-gradient(circle,var(--heroGlow),transparent 62%);pointer-events:none;z-index:0;opacity:0;transition:opacity .6s}
+@media(pointer:coarse){.cursor{display:none}}
+.nav{transition:top .45s cubic-bezier(.2,.7,.2,1),background .45s,box-shadow .45s}.nav.scrolled{top:6px;background:var(--surface2)}
+.hero>div:first-child>*{opacity:0;transform:translateY(26px);filter:blur(10px);transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1),filter 1s}
+.ready .hero>div:first-child>*{opacity:1;transform:none;filter:none}
+.hero>div:first-child>:nth-child(2){transition-delay:.12s}.hero>div:first-child>:nth-child(3){transition-delay:.24s}.hero>div:first-child>:nth-child(4){transition-delay:.36s}.hero>div:first-child>:nth-child(5){transition-delay:.48s}
+.stage{opacity:0;transform:scale(.92);transition:opacity 1.2s .3s,transform 1.4s .3s cubic-bezier(.2,.7,.2,1)}.ready .stage{opacity:1;transform:none}
+h1 .script{background-size:220% 100%;animation:grad 7s ease-in-out infinite}
+@keyframes grad{50%{background-position:100% 0}}
+.halo{translate:calc(var(--px,0)*-26px) calc(var(--py,0)*-20px)}
+.fA{translate:calc(var(--px,0)*18px) calc(var(--py,0)*14px);animation:bobA 6s ease-in-out infinite}
+.fB{translate:calc(var(--px,0)*30px) calc(var(--py,0)*24px);animation:bobB 7s ease-in-out infinite}
+@keyframes bobA{50%{transform:rotate(-5deg) translateY(-11px)}}@keyframes bobB{50%{transform:rotate(5deg) translateY(11px)}}
+.glassPanel{transition:none}
+.stage{touch-action:pan-y}
+.rv{opacity:0;transform:translateY(36px) scale(.98);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+.rv.on{opacity:1;transform:none}
+.bar i{transform-origin:left;transform:scaleX(0);transition:transform 1.5s cubic-bezier(.2,.7,.2,1) .25s}.bar i.f{transform:scaleX(1)}
+.glass{position:relative}
+.glass:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .4s;background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.16),transparent 45%)}
+.light .glass:after{background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.7),transparent 45%)}
+.glass:hover:after{opacity:1}
+.art:before{transition:transform .9s cubic-bezier(.2,.7,.2,1)}.campaign:hover .art:before{transform:scale(1.14)}
+.product{transition:transform .6s cubic-bezier(.2,.7,.2,1)}.campaign:hover .product{transform:translateY(-8px) rotate(6deg) scale(1.06)}
+.modal{display:grid;visibility:hidden;opacity:0;transition:opacity .35s,visibility .35s}.modal.show{visibility:visible;opacity:1}
+.modalBox{transform:translateY(24px) scale(.96);transition:transform .5s cubic-bezier(.2,.8,.2,1)}.modal.show .modalBox{transform:none}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.5s}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.cursor{display:none!important}}
+
+/* ---- box animations ---- */
+.glass:not(.rv){transition:border-color .4s,box-shadow .4s}
+.campaign.glass:not(.rv){transition:.3s}
+.glass:hover{border-color:color-mix(in srgb,var(--accent) 60%,transparent);box-shadow:var(--shadow),0 0 38px -10px var(--accent)}
+/* campaign cards */
+.art:after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 38%,rgba(255,255,255,.28) 50%,transparent 62%);transform:translateX(-120%);transition:transform 1s cubic-bezier(.2,.7,.2,1);pointer-events:none;z-index:2}
+.campaign:hover .art:after{transform:translateX(120%)}
+.art:before{animation:breathe 6s ease-in-out infinite}
+@keyframes breathe{50%{scale:1.09}}
+.product{animation:drift 5s ease-in-out infinite}
+.campaign:nth-child(2) .product{animation-delay:-1.6s}.campaign:nth-child(3) .product{animation-delay:-3.2s}
+@keyframes drift{50%{translate:0 -9px}}
+.tag{z-index:3}
+.bar i{position:relative;overflow:hidden}
+.bar i:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.65),transparent);transform:translateX(-100%);animation:shine 3s ease-in-out 2s infinite}
+@keyframes shine{60%,100%{transform:translateX(100%)}}
+/* AI feature cards */
+.featureIcon{position:relative;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.featureIcon:after{content:'';position:absolute;inset:-1px;border-radius:inherit;border:1px solid var(--accent);opacity:0;animation:ring 3s ease-out infinite}
+.feature:nth-child(2) .featureIcon:after{animation-delay:.7s}.feature:nth-child(3) .featureIcon:after{animation-delay:1.4s}.feature:nth-child(4) .featureIcon:after{animation-delay:2.1s}
+@keyframes ring{0%{transform:scale(1);opacity:.7}70%,100%{transform:scale(1.75);opacity:0}}
+.feature:hover .featureIcon{transform:rotate(-9deg) scale(1.12)}
+.orbSmall{animation:orbDrift 9s ease-in-out infinite;transition:transform .8s cubic-bezier(.2,.7,.2,1)}
+.feature:hover .orbSmall{transform:scale(1.25)}
+@keyframes orbDrift{50%{translate:-16px -14px}}
+/* stats */
+.stat{overflow:hidden}
+.stat b{display:inline-block;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.stat:hover b{transform:scale(1.14) translateX(4px)}
+.stat:before{content:'';position:absolute;left:20px;bottom:0;height:2px;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .7s cubic-bezier(.2,.7,.2,1)}
+.stat:hover:before{width:calc(100% - 40px)}
+/* steps */
+.step{overflow:hidden}
+.step:before{content:'';position:absolute;left:0;top:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));transform:scaleX(0);transform-origin:left;transition:transform 1s cubic-bezier(.2,.7,.2,1)}
+.step.go:before{transform:scaleX(1)}
+.step:nth-child(2):before{transition-delay:.15s}.step:nth-child(3):before{transition-delay:.3s}.step:nth-child(4):before{transition-delay:.45s}
+.step h3{transition:transform .4s cubic-bezier(.2,.7,.2,1)}.step:hover h3{transform:translateX(5px)}
+.step b{transition:letter-spacing .4s}.step:hover b{letter-spacing:.12em}
+/* calculator result */
+.total{background-size:200% 200%;animation:tshift 9s ease-in-out infinite}
+.total strong{font-variant-numeric:tabular-nums}
+@keyframes tshift{50%{background-position:100% 100%}}
+@keyframes tpulse{0%{box-shadow:0 0 0 0 var(--accent)}100%{box-shadow:0 0 0 18px transparent}}
+.total.pulse{animation:tpulse .7s ease-out,tshift 9s ease-in-out infinite}
+/* call to action */
+.cta{overflow:hidden}
+.cta>*{position:relative;z-index:1}
+.cta:before{content:'';position:absolute;width:460px;height:460px;border-radius:50%;left:-140px;top:-200px;background:radial-gradient(circle,var(--heroGlow),transparent 65%);animation:aurora 12s ease-in-out infinite}
+@keyframes aurora{50%{translate:520px 50px}}
+h2 .script{background:linear-gradient(100deg,var(--accent),var(--accent2),var(--accent))!important;background-size:220% 100%!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;animation:grad 7s ease-in-out infinite}
+/* hero panel */
+.glassPanel:before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.28) 50%,transparent 65%);background-size:260% 100%;background-position:120% 0;animation:sheen 6s ease-in-out infinite}
+@keyframes sheen{0%,35%{background-position:120% 0}75%,100%{background-position:-60% 0}}
+.gem{position:relative;overflow:hidden}
+.gem:after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.8) 50%,transparent 65%);transform:translateX(-120%);animation:gemshine 3.6s ease-in-out infinite}
+@keyframes gemshine{50%,100%{transform:translateX(120%)}}
+.live{animation:livePulse 2s ease-in-out infinite}
+@keyframes livePulse{50%{box-shadow:0 0 0 7px transparent;opacity:.6}}
+/* modal inputs */
+.modalBox input,.modalBox select{transition:border-color .3s,box-shadow .3s}
+.modalBox input:focus,.modalBox select:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+@media(prefers-reduced-motion:reduce){.cursor{display:none!important}}
+
+/* LAUNCHGLASS ECOSYSTEM EXPANSION */
+:root{--good:#68dfad;--warn:#ffc979}
+.sectionIntro{max-width:720px;color:var(--muted);font-size:13px;line-height:1.9;margin-top:12px}
+.eyebrow{font:10px 'DM Mono';letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.infoCard{padding:23px;border:1px solid var(--line);border-radius:19px;background:var(--surface);backdrop-filter:blur(18px);box-shadow:var(--shadow);position:relative;overflow:hidden}
+.infoCard h3{font-size:17px;margin:12px 0 8px;letter-spacing:-.04em}
+.infoCard p,.infoCard li{font-size:11px;line-height:1.85;color:var(--muted)}
+.infoIcon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#c3a0ff35,#7fc9ff25);border:1px solid var(--line);font-size:19px}
+.chip{display:inline-flex;padding:6px 9px;border:1px solid var(--line);border-radius:99px;color:var(--muted);font:9px 'DM Mono';margin:3px 4px 3px 0}
+.status{font:9px 'DM Mono';padding:6px 9px;border-radius:99px;background:#68dfad18;color:var(--good);border:1px solid #68dfad44}
+.demoLabel{font:9px 'DM Mono';color:var(--warn);letter-spacing:.1em;text-transform:uppercase}
+.inputField{width:100%;padding:13px 14px;margin:7px 0;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--text);font:12px Manrope;outline:none}
+.inputField:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
+textarea.inputField{min-height:110px;resize:vertical}
+.actionRow{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}
+.resultBox{display:none;padding:17px;border:1px solid var(--line);border-radius:15px;background:var(--surface2);margin-top:15px;color:var(--muted);font-size:11px;line-height:1.8;white-space:pre-wrap}
+.resultBox.show{display:block}
+.tableWrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px}
+.dataTable{width:100%;border-collapse:collapse;min-width:560px;font-size:11px}
+.dataTable th,.dataTable td{padding:13px 15px;text-align:left;border-bottom:1px solid var(--line)}
+.dataTable th{font:9px 'DM Mono';letter-spacing:.1em;color:var(--accent);text-transform:uppercase;background:var(--surface2)}
+.dataTable td{color:var(--muted)}.dataTable tr:last-child td{border:0}
+.roleTabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.roleTab{padding:10px 14px;border-radius:11px;border:1px solid var(--line);background:var(--surface);font-size:10px;font-weight:800}
+.roleTab.active{background:linear-gradient(110deg,#c5a1ff,#86bfff);color:#1b1230;border-color:transparent}
+.dashboardMock{padding:22px;border-radius:20px;border:1px solid var(--line);background:var(--surface);min-height:280px}
+.dashGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:15px}
+.dashMetric{padding:15px;border-radius:13px;background:var(--surface2);border:1px solid var(--line)}
+.dashMetric b{font-size:22px;display:block}.dashMetric span{font-size:9px;color:var(--muted)}
+.dashList{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+.dashItem{padding:12px;border-radius:12px;background:var(--surface2);font-size:10px;color:var(--muted)}
+.productScene{height:250px;border-radius:18px;background:radial-gradient(circle at 50% 45%,#9b75e555,transparent 48%),linear-gradient(135deg,#20183a,#101b31);display:grid;place-items:center;perspective:900px;overflow:hidden;position:relative}
+.productObject{width:120px;height:165px;border-radius:25px 25px 18px 18px;background:linear-gradient(120deg,#a9b9ce,#344b70 45%,#101d35);box-shadow:25px 25px 45px #0008,inset 5px 0 10px #fff5;transform-style:preserve-3d;transform:rotateY(var(--ry,22deg)) rotateX(var(--rx,-8deg));transition:transform .12s;position:relative}
+.productObject:before{content:'SMART';position:absolute;top:23px;left:0;right:0;text-align:center;font:9px 'DM Mono';color:#fff;letter-spacing:.2em}
+.productObject:after{content:'◉';position:absolute;bottom:22px;left:0;right:0;text-align:center;color:#9be7ff;font-size:24px;text-shadow:0 0 15px #8adfff}
+.sceneOrbit{position:absolute;width:205px;height:205px;border:1px solid #bca1ff55;border-radius:50%;transform:rotateX(68deg);animation:orbitSpin 12s linear infinite}
+@keyframes orbitSpin{to{transform:rotateX(68deg) rotateZ(360deg)}}
+.filterBar{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}
+.filterBtn{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:8px 12px;font:9px 'DM Mono';color:var(--muted)}
+.filterBtn.active{background:var(--accent);color:#211333}
+.milestone{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:11px;color:var(--muted)}.milestone:last-child{border:0}.milestone b{margin-left:auto;font-size:9px;color:var(--good)}
+.roadmap{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.roadmap .infoCard{padding:17px}.roadmap .infoCard h3{font-size:14px}
+.architecture{padding:24px;border:1px solid var(--line);border-radius:20px;background:var(--surface);text-align:center}
+.archNode{padding:13px;border-radius:11px;background:var(--surface2);border:1px solid var(--line);font-size:11px;font-weight:800;margin:8px auto;max-width:500px}
+.archArrow{color:var(--accent);font-size:20px;line-height:1}
+.disclaimer{padding:13px 15px;border-left:3px solid var(--warn);background:#ffc97912;border-radius:0 12px 12px 0;color:var(--muted);font-size:10px;line-height:1.8;margin-top:15px}
+.faq details{padding:16px 0;border-bottom:1px solid var(--line)}.faq summary{cursor:pointer;font-size:12px;font-weight:800}.faq details p{font-size:11px;line-height:1.8;color:var(--muted)}
+@media(max-width:800px){.grid4{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:1fr 1fr}.roadmap{grid-template-columns:1fr 1fr}.dashGrid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.grid2,.grid3,.grid4,.roadmap,.dashList{grid-template-columns:1fr}.dashGrid{grid-template-columns:1fr 1fr}.productScene{height:210px}}
+
+
+/* Animation reliability patch: retain motion on devices that request reduced motion,
+   while keeping the effects lightweight and independent of mouse hover. */
+.motionReveal{opacity:0;transform:translateY(24px);transition:opacity .75s ease,transform .75s cubic-bezier(.2,.7,.2,1);transition-delay:var(--reveal-delay,0ms)}
+.motionReveal.motionVisible{opacity:1;transform:translateY(0)}
+@keyframes launchglassFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes launchglassGlow{0%,100%{opacity:.55}50%{opacity:1}}
+@media(max-width:700px){.fA,.fB{animation-duration:8s,9s}.sceneOrbit{animation-duration:18s}}
+
+
+/* AUTH GATE + ACCOUNT CONTROLS */
+[hidden]{display:none!important}
+.authGate{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 18% 10%,rgba(155,111,255,.24),transparent 42%),radial-gradient(ellipse at 85% 80%,rgba(69,150,205,.18),transparent 38%),var(--bg);color:var(--text);overflow:auto}
+.authGlow{position:absolute;width:380px;height:380px;border-radius:50%;background:rgba(170,120,255,.12);filter:blur(70px);pointer-events:none}
+.authCard{position:relative;width:min(490px,100%);padding:clamp(25px,6vw,48px);border:1px solid var(--line);border-radius:28px;background:var(--surface);backdrop-filter:blur(24px);box-shadow:var(--shadow)}
+.authBrand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:18px;letter-spacing:-.05em}
+.authCopy{font-size:13px;line-height:1.8;color:var(--muted)}
+.googleSignIn{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;padding:15px 18px;border:1px solid var(--line);border-radius:13px;background:#fff;color:#202124;font-weight:800;font-size:13px;margin-top:24px;transition:transform .2s,box-shadow .2s}
+.googleSignIn:hover{transform:translateY(-2px);box-shadow:0 12px 30px #0002}
+.authMessage{min-height:20px;margin-top:12px;font-size:12px;color:#e8b86a;line-height:1.6}
+.authFine{font-size:10px!important;line-height:1.7!important;color:var(--muted)!important;margin-top:20px}
+.authConfigHint{margin-top:12px;padding:12px;border-radius:10px;background:#d69b2b18;color:#d9ae65;font-size:11px;line-height:1.6}
+.accountChip{font-size:10px;color:var(--muted);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#signOutButton{padding:9px 11px;font-size:10px}
+#workspaceLink{padding:9px 11px;font-size:10px}
+.liveCampaignGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}
+.liveCampaignCard{border:1px solid var(--line);border-radius:18px;background:var(--surface);padding:18px;min-width:0;transition:transform .25s,border-color .25s}
+.liveCampaignCard:hover{transform:translateY(-5px);border-color:var(--accent)}
+.liveCampaignCard h3{font-size:17px;margin:10px 0 7px}
+.liveCampaignCard p{font-size:11px;line-height:1.7;color:var(--muted)}
+.liveCampaignCard .btn{margin-top:12px}
+.workspacePanel{border:1px solid var(--line);border-radius:20px;background:var(--surface);padding:20px;margin:15px 0}
+.workspaceList{display:grid;gap:10px;margin-top:14px}
+.workspaceItem{padding:13px;border:1px solid var(--line);border-radius:12px;background:var(--surface2);display:flex;justify-content:space-between;gap:14px;align-items:center}
+.workspaceItem strong{font-size:12px}.workspaceItem small{display:block;color:var(--muted);font-size:10px;margin-top:4px}
+.ownerStats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}
+.ownerStat{padding:15px;border:1px solid var(--line);border-radius:14px;background:var(--surface2)}
+.ownerStat b{font-size:24px;display:block}.ownerStat span{font-size:10px;color:var(--muted)}
+.ownerTableWrap{overflow:auto;margin-top:12px;border:1px solid var(--line);border-radius:12px}
+.ownerTable{border-collapse:collapse;width:100%;font-size:11px;min-width:580px}.ownerTable th,.ownerTable td{padding:11px;text-align:left;border-bottom:1px solid var(--line)}.ownerTable th{color:var(--accent);font:10px 'DM Mono';text-transform:uppercase}.ownerTable td{color:var(--muted)}
+.statusPill{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:4px 8px;font-size:9px}
+.appNotice{position:fixed;right:20px;bottom:20px;z-index:1001;max-width:min(390px,calc(100vw - 40px));padding:13px 16px;border:1px solid var(--line);border-radius:13px;background:var(--surface2);backdrop-filter:blur(18px);box-shadow:var(--shadow);font-size:12px;opacity:0;transform:translateY(10px);pointer-events:none;transition:.25s}
+.appNotice.show{opacity:1;transform:translateY(0)}
+#campaignResult,#ideaResult{white-space:pre-wrap;line-height:1.7}
+@media(max-width:760px){.liveCampaignGrid{grid-template-columns:1fr}.ownerStats{grid-template-columns:repeat(2,minmax(0,1fr))}.accountChip{display:none}}
+
+</style>
+</head>
+
+<body>
+<div id="authGate" class="authGate">
+  <div class="authGlow"></div>
+  <div class="authCard">
+    <div class="authBrand"><span class="mark">✦</span> launchglass.</div>
+    <div class="mono" style="margin-top:28px">YOUR IDEA STARTS HERE</div>
+    <h1 style="font-size:clamp(38px,7vw,58px);margin:14px 0">From idea to <span class="script">reality.</span></h1>
+    <p class="authCopy">Sign in securely to save your ideas, build campaign drafts and access your personal Launchglass workspace.</p>
+    <button id="googleSignIn" class="googleSignIn" type="button"><svg width="19" height="19" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.25 5.48-4.72 7.18l7.62 5.91c4.45-4.11 7.14-10.17 7.14-17.56z"/><path fill="#FBBC05" d="M10.54 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.53 2.56 10.78l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.89l-7.62-5.91c-2.11 1.41-4.81 2.25-8.28 2.25-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Continue with Google</button>
+    <div id="authMessage" class="authMessage" role="status"></div>
+    <p class="authFine">By continuing, you agree to use Launchglass responsibly. Campaigns are drafts until reviewed. This MVP does not process payments or investment contributions.</p>
+    <div class="authConfigHint" id="configHint" hidden>Setup needed: add your Supabase project URL and publishable key in <code>config.js</code>.</div>
+  </div>
+</div>
+<div id="appShell" hidden>
+
+<div class="progress" id="progress"></div><div class="cursor" id="cursor"></div>
+
+<nav class="nav">
+  <a class="brand" href="#">
+    <span class="mark">✦</span> launchglass.
+  </a>
+
+  <div class="links">
+    <a href="#product-discovery">Discover</a>
+    <a href="#ai-workbench">AI Co-Founder</a>
+    <a href="#crowdfunding">Crowdfunding</a>
+    <a href="#manufacturing">Manufacturing</a>
+    <a href="#dashboards">Dashboards</a>
+  </div>
+
+  <div class="navActions">
+
+    <button class="snapToggle" id="pullTheme" type="button" aria-label="Thanos snap to switch between dark and light themes" title="Snap to switch theme">
+      <svg class="snapHand" viewBox="0 0 100 100" role="img" aria-label="Golden Infinity Gauntlet hand">
+        <defs>
+          <linearGradient id="goldGauntlet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0a6"/><stop offset=".38" stop-color="#e8b94f"/><stop offset="1" stop-color="#8b5018"/></linearGradient>
+          <linearGradient id="purpleSkin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c18aaa"/><stop offset="1" stop-color="#583452"/></linearGradient>
+        </defs>
+        <g class="snapHandArt">
+          <path d="M42 92 39 72 55 66 68 75 69 100H43Z" fill="url(#purpleSkin)" stroke="#e3b75b" stroke-width="2"/>
+          <path d="M39 76 35 56Q34 51 39 49L43 48 43 24Q43 17 49 17T55 24V43 18Q55 11 61 11T67 18V43 22Q67 15 73 16T79 23V49Q84 43 89 48T88 61L83 78 68 87Z" fill="url(#goldGauntlet)" stroke="#754713" stroke-width="2.4" stroke-linejoin="round"/>
+          <g class="snapFingerGroup" fill="url(#goldGauntlet)" stroke="#754713" stroke-width="2.2" stroke-linecap="round">
+            <path d="M43 49 42 24Q42 17 48 17T54 24L55 50"/><path d="M55 46 55 18Q55 11 61 11T67 18L67 48"/><path d="M67 48 67 23Q67 16 73 16T79 23L78 54"/>
+          </g>
+          <path class="snapThumb" d="M40 56 26 44Q21 39 25 34T34 34L50 48" fill="url(#goldGauntlet)" stroke="#754713" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M40 58Q58 51 81 60L76 79Q59 89 43 79Z" fill="url(#goldGauntlet)" stroke="#754713" stroke-width="2.5"/>
+          <path d="M45 66 53 61 61 66 57 74 48 74Z" fill="#7b3ec4" stroke="#f7d77c" stroke-width="2"/>
+          <circle cx="61" cy="60" r="4.2" fill="#35aaff" stroke="#fff0b2"/><circle cx="72" cy="66" r="4" fill="#ff3e48" stroke="#fff0b2"/><circle cx="48" cy="78" r="3.7" fill="#43df76" stroke="#fff0b2"/>
+          <path d="M36 83 75 86M39 89 73 92" stroke="#f8d47a" stroke-width="2" opacity=".8"/>
+        </g>
+      </svg>
+    </button>
+
+    <span id="accountChip" class="accountChip"></span>
+    <a class="btn" id="workspaceLink" href="#my-workspace">My workspace</a>
+    <button class="btn" id="signOutButton" type="button">Sign out</button>
+    <button class="btn primary" onclick="openModal('launch')">Start a project ↗</button>
+  </div>
+</nav>
+
+<main>
+
+<section class="wrap hero">
+
+  <div>
+    <div class="pill">
+      <span class="live"></span>
+      THE FUTURE OF PRODUCT LAUNCHES
+    </div>
+
+    <h1>
+      Your idea.<br>
+      Your people.<br>
+      <span class="script">Your moment.</span>
+    </h1>
+
+    <p>
+      From the first spark of an idea to the moment it becomes real.
+      Launchglass brings AI-powered planning, crowdfunding, community
+      and production together in one place.
+    </p>
+
+    <div class="actions">
+      <button class="btn primary" onclick="openModal('launch')">
+        Launch your idea ↗
+      </button>
+
+      <a class="btn" href="#discover">Explore ideas ↓</a>
+    </div>
+
+    <div class="note">
+      BUILT FOR CREATORS · BACKERS · MAKERS
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+
+    <div class="halo"></div>
+
+    <div class="floating fA">
+      <small>CREATOR MOMENTUM</small>
+      <strong>Ideas → Impact</strong>
+    </div>
+
+    <div class="glassPanel" id="glassPanel">
+
+      <div class="panelTop">
+        <span class="mono">/ THE NEXT BIG THING</span>
+        <span class="gem"></span>
+      </div>
+
+      <div class="panelBig">
+        Ideas worth bringing to life.
+      </div>
+
+      <div class="panelBottom">
+        <div>
+          <small>COMMUNITY BACKING</small>
+          <strong>One idea at a time.</strong>
+        </div>
+        <span class="mono">LG / 001</span>
+      </div>
+
+    </div>
+
+    <div class="floating fB">
+      <small>BUILT TOGETHER</small>
+      <strong>+ Community</strong>
+    </div>
+
+  </div>
+</section>
+
+<section class="wrap section">
+  <div class="stats">
+
+    <div class="stat glass">
+      <b>01</b>
+      <span>One connected launch journey</span>
+    </div>
+
+    <div class="stat glass">
+      <b>AI</b>
+      <span>Your digital co-founder</span>
+    </div>
+
+    <div class="stat glass">
+      <b>360°</b>
+      <span>Idea to production ecosystem</span>
+    </div>
+
+    <div class="stat glass">
+      <b>∞</b>
+      <span>Possibilities worth exploring</span>
+    </div>
+
+  </div>
+</section>
+
+<section class="wrap section" id="discover">
+
+  <div class="sectionHead">
+    <div>
+      <div class="mono">/ DISCOVER WHAT’S NEXT</div>
+      <h2>
+        Ideas worth
+        <span class="script">getting excited about.</span>
+      </h2>
+    </div>
+
+    <p>
+      Discover early concepts and products looking for their
+      first community of supporters.
+    </p>
+  </div>
+
+  <div class="campaigns">
+
+    <article class="campaign glass">
+      <div class="art one">
+        <span class="tag">TECHNOLOGY</span>
+        <span class="product">◈</span>
+      </div>
+
+      <div class="campaignBody">
+        <h3>Echo · A little more sound</h3>
+        <p>
+          A compact desktop sound object designed to make
+          your workspace feel different.
+        </p>
+
+        <div class="fund">
+          <span>₹3,42,000 raised</span>
+          <b>68%</b>
+        </div>
+
+        <div class="bar"><i style="width:68%"></i></div>
+
+        <div class="campaignMeta">
+          <span>124 supporters</span>
+          <span>12 days left</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="campaign glass">
+      <div class="art two">
+        <span class="tag">SUSTAINABILITY</span>
+        <span class="product">⌁</span>
+      </div>
+
+      <div class="campaignBody">
+        <h3>Sprout · A smarter grow kit</h3>
+        <p>
+          A minimal indoor growing system for fresh greens
+          in small spaces.
+        </p>
+
+        <div class="fund">
+          <span>₹2,18,500 raised</span>
+          <b>87%</b>
+        </div>
+
+        <div class="bar"><i style="width:87%"></i></div>
+
+        <div class="campaignMeta">
+          <span>209 supporters</span>
+          <span>5 days left</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="campaign glass">
+      <div class="art three">
+        <span class="tag">LIFESTYLE · NEW</span>
+        <span class="product">✿</span>
+      </div>
+
+      <div class="campaignBody">
+        <h3>Forma · Everyday carry</h3>
+        <p>
+          A modular carry system that adapts to the rhythm
+          of your day.
+        </p>
+
+        <div class="fund">
+          <span>₹1,76,000 raised</span>
+          <b>44%</b>
+        </div>
+
+        <div class="bar"><i style="width:44%"></i></div>
+
+        <div class="campaignMeta">
+          <span>86 supporters</span>
+          <span>21 days left</span>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<section class="wrap section" id="ai">
+
+  <div class="sectionHead">
+    <div>
+      <div class="mono">/ YOUR DIGITAL CO-FOUNDER</div>
+      <h2>
+        Big ideas need<br>
+        <span class="script">a brilliant sidekick.</span>
+      </h2>
+    </div>
+
+    <p>
+      AI assistance to help creators move from scattered
+      thoughts to a clearer, more confident launch plan.
+    </p>
+  </div>
+
+  <div class="features">
+
+    <div class="feature glass">
+      <div class="featureIcon">✧</div>
+      <div class="mono">AI IDEA LAB</div>
+      <h3>Make the idea<br><span class="script">make sense.</span></h3>
+      <p>
+        Explore your concept, map your audience, research competitors,
+        and identify what needs validating before you build.
+      </p>
+      <div class="orbSmall"></div>
+    </div>
+
+    <div class="feature glass">
+      <div class="featureIcon">↗</div>
+      <div class="mono">CAMPAIGN STUDIO</div>
+      <h3>Turn clarity into<br><span class="script">momentum.</span></h3>
+      <p>
+        Shape your story, plan reward tiers, draft campaign content,
+        and prepare a launch checklist you can actually use.
+      </p>
+      <div class="orbSmall"></div>
+    </div>
+
+    <div class="feature glass">
+      <div class="featureIcon">⌁</div>
+      <div class="mono">MARKET INSIGHTS</div>
+      <h3>Understand the<br><span class="script">opportunity.</span></h3>
+      <p>
+        Organize market research, compare alternatives, identify
+        customer problems, and separate sourced facts from estimates.
+      </p>
+    </div>
+
+    <div class="feature glass">
+      <div class="featureIcon">✦</div>
+      <div class="mono">LAUNCH READINESS</div>
+      <h3>Know what comes<br><span class="script">next.</span></h3>
+      <p>
+        Build a practical checklist for product clarity, pricing,
+        rewards, campaign quality, and production preparation.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<section class="wrap section" id="calculator">
+
+  <div class="sectionHead">
+    <div>
+      <div class="mono">/ PLAN WITH CLARITY</div>
+      <h2>
+        Funding, made<br>
+        <span class="script">understandable.</span>
+      </h2>
+    </div>
+
+    <p>
+      Explore an illustrative funding estimate. Final platform,
+      payment, tax, and service fees depend on actual agreements.
+    </p>
+  </div>
+
+  <div class="calc glass">
+
+    <div class="controls">
+
+      <label>
+        <span>Campaign funding goal</span>
+        <b id="goalLabel">₹5,00,000</b>
+      </label>
+
+      <input
+        id="goal"
+        type="range"
+        min="50000"
+        max="2500000"
+        step="25000"
+        value="500000"
+      >
+
+      <label>
+        <span>Illustrative platform fee</span>
+        <b>5%</b>
+      </label>
+
+      <div class="toggleRow">
+        <span>Include estimated processing fee (2%)</span>
+        <div
+          class="toggleMini"
+          id="processing"
+          role="switch"
+          aria-checked="true"
+          tabindex="0">
+        </div>
+      </div>
+
+    </div>
+
+    <div class="total">
+      <small>ESTIMATED NET AFTER FEES</small>
+      <strong id="net">₹4,65,000</strong>
+      <p id="feeText">
+        Platform estimate: ₹25,000 · Processing estimate: ₹10,000.
+        Not a payment quote.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<section class="wrap section" id="how">
+
+  <div class="sectionHead">
+    <div>
+      <div class="mono">/ FROM FIRST THOUGHT TO FIRST SHIPMENT</div>
+      <h2>
+        A clearer path to<br>
+        <span class="script">bring it to life.</span>
+      </h2>
+    </div>
+  </div>
+
+  <div class="steps">
+
+    <div class="step glass">
+      <b>01 / VALIDATE</b>
+      <h3>Test the idea</h3>
+      <p>
+        Use research tools and community feedback to understand
+        the problem and potential audience.
+      </p>
+    </div>
+
+    <div class="step glass">
+      <b>02 / PREPARE</b>
+      <h3>Build the story</h3>
+      <p>
+        Create a campaign, define rewards, set a funding goal,
+        and explain the product clearly.
+      </p>
+    </div>
+
+    <div class="step glass">
+      <b>03 / FUND</b>
+      <h3>Find your people</h3>
+      <p>
+        Share the campaign and invite supporters to help
+        bring the idea forward.
+      </p>
+    </div>
+
+    <div class="step glass">
+      <b>04 / MAKE</b>
+      <h3>Bring it to life</h3>
+      <p>
+        Connect with production partners and keep supporters
+        informed through milestones.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<section class="wrap section">
+  <div class="cta glass">
+    <div class="mono">/ THE NEXT BIG THING STARTS HERE</div>
+
+    <h2>
+      Have an idea?
+      <span class="script">Let’s make it real.</span>
+    </h2>
+
+    <p>
+      Give your idea a place to grow, a community to support it,
+      and a connected path from concept to product.
+    </p>
+
+    <button class="btn primary" onclick="openModal('launch')">
+      Bring your idea to life ↗
+    </button>
+  </div>
+</section>
+
+
+
+<!-- COMPLETE STARTUP VISION: PROBLEM, SOLUTION AND CUSTOMER JOURNEY -->
+<section class="wrap section" id="vision">
+ <div class="sectionHead"><div><div class="mono">/ THE BIGGER MISSION</div><h2>Your idea deserves<br><span class="script">to exist.</span></h2></div><p>Launchglass is designed as an end-to-end product launch ecosystem—not just a crowdfunding page.</p></div>
+ <p class="sectionIntro">We help creators move from an early idea to validation, planning, community backing, production and delivery. Our mission is to make entrepreneurship more accessible, regardless of a creator's financial resources or business experience.</p>
+ <div class="grid3" style="margin-top:24px">
+  <article class="infoCard"><div class="infoIcon">💡</div><h3>Funding is hard to access</h3><p>Reward-based crowdfunding can help creators test interest and seek support from people who want the product.</p><span class="chip">Funding access</span></article>
+  <article class="infoCard"><div class="infoIcon">🧠</div><h3>Business knowledge is uneven</h3><p>AI-guided planning can help creators research audiences, prepare budgets, shape campaigns and understand next steps.</p><span class="chip">AI guidance</span></article>
+  <article class="infoCard"><div class="infoIcon">🎯</div><h3>Demand is uncertain</h3><p>Research, waitlists and community feedback help creators learn before committing to expensive production.</p><span class="chip">Validation</span></article>
+  <article class="infoCard"><div class="infoIcon">🏭</div><h3>Manufacturing is fragmented</h3><p>A production-partner directory and quotation workflow can connect creators with relevant manufacturing capabilities.</p><span class="chip">Manufacturing</span></article>
+  <article class="infoCard"><div class="infoIcon">🔎</div><h3>Progress can be unclear</h3><p>Campaign updates, milestone evidence and clear delivery estimates give supporters better visibility.</p><span class="chip">Transparency</span></article>
+  <article class="infoCard"><div class="infoIcon">🌱</div><h3>Launch is only the beginning</h3><p>After a campaign, creators need help coordinating production, fulfillment and the next stage of their business.</p><span class="chip">Business growth</span></article>
+ </div>
+</section>
+
+<!-- COMPLETE CREATOR JOURNEY -->
+<section class="wrap section" id="journey">
+ <div class="sectionHead"><div><div class="mono">/ IDEA TO REALITY</div><h2>One connected<br><span class="script">launch journey.</span></h2></div><p>A practical view of how a creator and their supporters move through the ecosystem.</p></div>
+ <div class="grid4">
+  <article class="infoCard"><b class="mono">01 / DISCOVER</b><h3>Start with an idea</h3><p>Create an account, describe the product and define the problem it solves.</p></article>
+  <article class="infoCard"><b class="mono">02 / VALIDATE</b><h3>Understand demand</h3><p>Use AI-assisted research, competitor mapping, waitlists and community feedback.</p></article>
+  <article class="infoCard"><b class="mono">03 / PLAN</b><h3>Prepare the business</h3><p>Draft a business plan, estimate costs, explore pricing and assess launch readiness.</p></article>
+  <article class="infoCard"><b class="mono">04 / PRESENT</b><h3>Build the campaign</h3><p>Add product media, optional 3D previews, funding goals, duration and reward tiers.</p></article>
+  <article class="infoCard"><b class="mono">05 / DISCOVER</b><h3>Reach supporters</h3><p>Publish for review, appear in discovery and collect questions, saves and expressions of interest.</p></article>
+  <article class="infoCard"><b class="mono">06 / FUND</b><h3>Receive contributions</h3><p>Eligible campaigns use approved payment flows, clear funding conditions and transaction records.</p></article>
+  <article class="infoCard"><b class="mono">07 / PRODUCE</b><h3>Find a partner</h3><p>Request manufacturer quotations, select a partner and publish production milestones.</p></article>
+  <article class="infoCard"><b class="mono">08 / DELIVER</b><h3>Fulfil and grow</h3><p>Coordinate quality checks, shipping, reward fulfillment and the next business chapter.</p></article>
+ </div>
+ <div class="disclaimer">Example journey only. A campaign is not a guarantee of funding, manufacturing success or delivery. Actual funding conditions, refunds, payouts and creator obligations must be clearly defined before live launch.</div>
+</section>
+
+<!-- AI COFOUNDER WORKBENCH -->
+<section class="wrap section" id="ai-workbench">
+ <div class="sectionHead"><div><div class="mono">/ YOUR DIGITAL BUSINESS SIDEKICK</div><h2>Meet your AI<br><span class="script">Co-Founder.</span></h2></div><p>One workspace for exploring an idea, preparing a business plan and getting campaign-ready.</p></div>
+ <div class="grid2">
+  <div class="infoCard"><div class="demoLabel">Gemini-powered analysis · Your result is saved to your workspace</div><h3>Idea Analyzer</h3><p>Enter a concept to preview a structured analysis. A production version will use Gemini through a secure backend and label sources, assumptions and estimates.</p>
+   <input class="inputField" id="ideaTitle" placeholder="Product name (e.g. SmartGuard Backpack)">
+   <textarea class="inputField" id="ideaDescription" placeholder="Describe your product idea, the problem it solves and who might use it..."></textarea>
+   <div class="actionRow"><button class="btn primary" id="analyzeIdea">Analyze my idea ↗</button><button class="btn" id="clearIdea">Clear</button></div>
+   <div class="resultBox" id="ideaResult"></div>
+  </div>
+  <div class="infoCard"><div class="infoIcon">🧠</div><h3>AI Co-Founder toolkit</h3>
+   <div class="milestone">✧ Idea Analyzer <b>Gemini live</b></div><div class="milestone">⌕ Market Research & Competitor Analysis <b>Research checklist</b></div><div class="milestone">▤ Business Plan Generator <b>Gemini live</b></div><div class="milestone">₹ Pricing & Financial Planning <b>Gemini live</b></div><div class="milestone">↗ Campaign & Marketing Generator <b>Gemini live</b></div><div class="milestone">✓ Launch Readiness Score <b>Gemini live</b></div><div class="milestone">✦ AI Business Chat <b>Future upgrade</b></div>
+  </div>
+ </div>
+ <div class="grid3" style="margin-top:15px">
+  <article class="infoCard"><h3>Business plan builder</h3><p>Executive summary, product description, market analysis, customer profile, pricing strategy, cost estimates, marketing plan, revenue projections and risk assessment.</p></article>
+  <article class="infoCard"><h3>Campaign studio</h3><p>AI-assisted campaign story, reward-tier ideas, product page copy, launch checklist, social posts and promotional concepts.</p></article>
+  <article class="infoCard"><h3>Evidence-aware AI</h3><p>Separate sourced research from estimates and assumptions. Show source dates, confidence limits and items that require human verification.</p></article>
+ </div>
+</section>
+
+<!-- CAMPAIGN BUILDER PREVIEW -->
+<section class="wrap section" id="campaign-builder">
+ <div class="sectionHead"><div><div class="mono">/ CREATE SOMETHING REAL</div><h2>Campaign<br><span class="script">builder preview.</span></h2></div><p>Show the campaign information a creator will eventually configure before submitting it for review.</p></div>
+ <div class="grid2">
+  <div class="infoCard">
+   <div class="demoLabel">Create a persistent campaign draft, then submit it for owner review</div>
+   <input class="inputField" id="campaignName" placeholder="Campaign / product name">
+   <textarea class="inputField" id="campaignStory" placeholder="What are you building, who is it for, and why does it matter?"></textarea>
+   <div class="grid2"><input class="inputField" id="campaignGoal" type="number" min="1" placeholder="Funding goal (₹)"><input class="inputField" id="campaignDays" type="number" min="1" max="90" placeholder="Duration (days)"></div>
+   <input class="inputField" id="campaignReward" placeholder="Early supporter reward (e.g. product at ₹3,499)">
+   <select class="inputField" id="campaignCategory"><option value="">Choose category</option><option>Technology</option><option>Electronics</option><option>Smart Gadgets</option><option>Fashion</option><option>Sustainability</option><option>Gaming</option><option>Lifestyle</option><option>Creative Products</option></select>
+   <div class="actionRow"><button class="btn" id="generateCampaignCopy" type="button">Write campaign story with Gemini</button><button class="btn" id="previewCampaign" type="button">Preview ↗</button><button class="btn primary" id="saveCampaign" type="button">Save draft</button><button class="btn primary" id="submitCampaign" type="button">Submit for review</button></div><div class="resultBox" id="campaignResult"></div>
+  </div>
+  <div class="infoCard"><h3>Campaign media & settings</h3><p>Creator media uploads and advanced reward inventory are future upgrades. Draft creation, submission and owner approval are connected.</p>
+   <div class="milestone">Product photographs <b>Upload planned</b></div><div class="milestone">Demonstration video <b>Upload planned</b></div><div class="milestone">Optional interactive 3D model <b>Planned</b></div><div class="milestone">Funding goal and deadline <b>Planned</b></div><div class="milestone">Reward tiers and early-bird offers <b>Planned</b></div><div class="milestone">Creator story and risks <b>Planned</b></div><div class="milestone">Owner review queue <b>Connected</b></div>
+   <div class="disclaimer">A campaign preview is not a live campaign. Publication requires authentication, database storage, moderation and approved operational workflows.</div>
+  </div>
+ </div>
+</section>
+
+<!-- PRODUCT DISCOVERY -->
+
+<section class="wrap section" id="my-workspace">
+ <div class="sectionHead"><div><div class="mono">/ YOUR PRIVATE SPACE</div><h2>My <span class="script">workspace.</span></h2></div><p>Your saved ideas, campaign drafts and expressions of interest. Only your account and platform admins can access your private records.</p></div>
+ <div class="grid2">
+  <div class="workspacePanel"><div class="panelTop"><h3>Saved ideas</h3><button class="btn" id="exportMyData" type="button">Export my data ↓</button></div><div id="myIdeas" class="workspaceList"><p class="mono">Loading your ideas…</p></div></div>
+  <div class="workspacePanel"><h3>Campaign drafts & submissions</h3><div id="myCampaigns" class="workspaceList"><p class="mono">Loading your campaigns…</p></div></div>
+ </div>
+ <div class="workspacePanel"><h3>Saved AI documents</h3><div id="myAIDocuments" class="workspaceList"><p class="mono">Loading your AI documents…</p></div></div>
+ <div class="workspacePanel"><h3>Campaigns you are following</h3><div id="myInterests" class="workspaceList"><p class="mono">Loading saved interests…</p></div></div>
+</section>
+
+<section class="wrap section" id="product-discovery">
+ <div class="sectionHead"><div><div class="mono">/ DISCOVER WHAT'S NEXT</div><h2>Discovery that feels<br><span class="script">like exploration.</span></h2></div><p>Find early products by category, community interest and campaign progress.</p></div>
+ <div class="filterBar" id="categoryFilters"><button class="filterBtn active" data-filter="all">All ideas</button><button class="filterBtn" data-filter="Technology">Technology</button><button class="filterBtn" data-filter="Sustainability">Sustainability</button><button class="filterBtn" data-filter="Lifestyle">Lifestyle</button><button class="filterBtn" data-filter="Gaming">Gaming</button><button class="filterBtn" data-filter="Fashion">Fashion</button></div>
+ <div class="grid3" id="discoveryCards">
+  <article class="infoCard discoveryCard" data-category="Technology"><span class="chip">TECHNOLOGY</span><h3>SmartGuard Backpack</h3><p>Illustrative concept: GPS tracking, anti-theft alerts and organized compartments.</p><span class="status">Concept preview</span></article>
+  <article class="infoCard discoveryCard" data-category="Sustainability"><span class="chip">SUSTAINABILITY</span><h3>Sprout Grow Kit</h3><p>A compact indoor growing system concept for smaller living spaces.</p><span class="status">Concept preview</span></article>
+  <article class="infoCard discoveryCard" data-category="Lifestyle"><span class="chip">LIFESTYLE</span><h3>Forma Everyday Carry</h3><p>A modular carry system concept that adapts to daily needs.</p><span class="status">Concept preview</span></article>
+  <article class="infoCard discoveryCard" data-category="Gaming"><span class="chip">GAMING</span><h3>Arcade Pocket</h3><p>A portable gaming accessory concept for a compact setup.</p><span class="status">Concept preview</span></article>
+  <article class="infoCard discoveryCard" data-category="Fashion"><span class="chip">FASHION</span><h3>ReThread</h3><p>A customizable accessories concept using recycled materials.</p><span class="status">Concept preview</span></article>
+  <article class="infoCard discoveryCard" data-category="Technology"><span class="chip">TECHNOLOGY</span><h3>DeskSense</h3><p>A workspace companion concept with smart desk utilities.</p><span class="status">Concept preview</span></article>
+ </div>
+ <div class="grid2" style="margin-top:18px">
+  <div class="infoCard"><h3>Personalized discovery</h3><p>Planned recommendations based on declared interests, saved products and activity—with transparent controls and privacy-conscious settings.</p><span class="chip">Trending innovations</span><span class="chip">AI recommendations</span><span class="chip">Personal collections</span><span class="chip">Swipe discovery</span></div>
+  <div class="infoCard"><h3>Community layer</h3><p>Planned features: save products, follow creators, ask campaign questions, join discussions and receive creator updates.</p><span class="chip">Save</span><span class="chip">Follow</span><span class="chip">Questions</span><span class="chip">Discussions</span></div>
+ </div>
+</section>
+
+<!-- 3D PRODUCT PREVIEW -->
+<div class="wrap" style="margin-top:20px"><div class="sectionHead"><div><div class="mono">/ COMMUNITY LAUNCHES</div><h2>Live <span class="script">campaigns.</span></h2></div><p>Campaigns approved by the Launchglass owner appear here. This MVP does not collect payments.</p></div><div id="liveCampaigns" class="liveCampaignGrid"><p style="color:var(--muted);font-size:12px">Loading approved campaigns…</p></div></div>
+
+<section class="wrap section" id="product-preview">
+ <div class="sectionHead"><div><div class="mono">/ SEE THE PRODUCT FROM EVERY ANGLE</div><h2>Products, beyond<br><span class="script">flat images.</span></h2></div><p>Interactive 3D previews are planned for campaigns that provide a supported model.</p></div>
+ <div class="grid2">
+  <div class="productScene" id="productScene" aria-label="Decorative interactive smart backpack preview"><div class="sceneOrbit"></div><div class="productObject" id="productObject"></div></div>
+  <div class="infoCard"><div class="demoLabel">Illustrative 3D-style interaction · Not a product CAD model</div><h3>SmartGuard Backpack</h3><p>Rotate the preview by moving your pointer across the model area. A production implementation can use Three.js and creator-uploaded optimized 3D assets.</p><div class="milestone">360° rotation <b>Preview</b></div><div class="milestone">Zoom controls <b>Planned</b></div><div class="milestone">Product hotspots <b>Planned</b></div><div class="milestone">Mobile touch gestures <b>Planned</b></div></div>
+ </div>
+</section>
+
+<!-- CROWDFUNDING & BACKER EXPERIENCE -->
+<section class="wrap section" id="crowdfunding">
+ <div class="sectionHead"><div><div class="mono">/ BACK THE NEXT BIG THING</div><h2>Reward-based<br><span class="script">crowdfunding.</span></h2></div><p>Supporters contribute toward a product campaign in exchange for clearly described rewards—not shares or investment returns.</p></div>
+ <div class="grid3">
+  <article class="infoCard"><div class="infoIcon">🎁</div><h3>Reward tiers</h3><p>Creators can configure early-bird offers, product rewards, limited quantities and estimated delivery windows.</p></article>
+  <article class="infoCard"><div class="infoIcon">💳</div><h3>Contribution checkout</h3><p>Planned payment flow with provider confirmation, transaction references, receipts and contribution history.</p></article>
+  <article class="infoCard"><div class="infoIcon">📈</div><h3>Campaign progress</h3><p>Funding totals and progress should update only from verified payment events, not browser-side counters.</p></article>
+  <article class="infoCard"><div class="infoIcon">🔔</div><h3>Supporter updates</h3><p>Campaign announcements, milestone updates, delivery notices and notification preferences.</p></article>
+  <article class="infoCard"><div class="infoIcon">↩</div><h3>Refund workflow</h3><p>Supporter requests, eligibility checks, status tracking and documented outcomes under published policies.</p></article>
+  <article class="infoCard"><div class="infoIcon">🧾</div><h3>Creator financial records</h3><p>Contribution ledger, fees, refunds, payout status and downloadable financial reports.</p></article>
+ </div>
+ <div class="disclaimer">Launchglass initially plans reward-based crowdfunding only. It does not offer equity, shares, investment returns or guaranteed rewards. Razorpay, PayPal and other providers must approve the exact business model. Fund custody, settlement, refunds, KYC, taxes and payout arrangements require professional legal and provider review before real payments are accepted.</div>
+</section>
+
+<!-- MANUFACTURER MARKETPLACE -->
+<section class="wrap section" id="manufacturing">
+ <div class="sectionHead"><div><div class="mono">/ FROM FUNDED TO MADE</div><h2>Meet the people<br><span class="script">who make it real.</span></h2></div><p>A two-sided manufacturing network for creators and production partners.</p></div>
+ <div class="grid2">
+  <div class="infoCard"><div class="infoIcon">🧑‍💻</div><h3>For creators</h3><ul><li>Search manufacturers by category and capability.</li><li>Compare services, location, minimum order quantities and previous work.</li><li>Request and compare quotations.</li><li>Discuss specifications, samples and production timelines.</li><li>Track agreed production milestones.</li></ul></div>
+  <div class="infoCard"><div class="infoIcon">🏭</div><h3>For manufacturers</h3><ul><li>Register a business profile.</li><li>List capabilities, equipment and specializations.</li><li>Upload portfolio and prior work.</li><li>Receive partnership requests and send quotations.</li><li>Coordinate projects and publish progress.</li></ul></div>
+ </div>
+ <div class="tableWrap" style="margin-top:18px"><table class="dataTable"><thead><tr><th>Example partner listing</th><th>Capability</th><th>Review status</th><th>Next action</th></tr></thead><tbody><tr><td>Electronics production partner</td><td>PCB assembly, enclosure integration</td><td>Illustrative listing</td><td>Request quotation</td></tr><tr><td>Bag & textile workshop</td><td>Cutting, stitching, custom compartments</td><td>Illustrative listing</td><td>View capabilities</td></tr><tr><td>Packaging supplier</td><td>Retail and shipping packaging</td><td>Illustrative listing</td><td>Contact partner</td></tr></tbody></table></div>
+ <div class="disclaimer">Any “verified” or “reviewed” badge must be backed by a documented verification process. A listing or verification check does not guarantee quality, delivery, solvency or project success.</div>
+</section>
+
+<!-- TRUST ENGINE & PRODUCTION TRACKING -->
+<section class="wrap section" id="trust">
+ <div class="sectionHead"><div><div class="mono">/ TRUST IS BUILT IN THE DETAILS</div><h2>Transparency at<br><span class="script">every milestone.</span></h2></div><p>Help creators and supporters understand campaign status, responsibilities and production progress.</p></div>
+ <div class="grid3">
+  <article class="infoCard"><h3>Creator verification</h3><p>Identity and business checks where appropriate, secure document handling and clear verification status.</p></article>
+  <article class="infoCard"><h3>Campaign review</h3><p>Administrative checks for campaign completeness, prohibited content, reward clarity and required disclosures.</p></article>
+  <article class="infoCard"><h3>Evidence-backed updates</h3><p>Creators can attach milestone notes, photographs, test summaries and relevant supporting documents.</p></article>
+  <article class="infoCard"><h3>Clear campaign terms</h3><p>Funding conditions, risks, delivery estimates, reward descriptions and creator obligations are visible.</p></article>
+  <article class="infoCard"><h3>Dispute support</h3><p>Issue reporting, case history, evidence submission, response tracking and escalation to platform support.</p></article>
+  <article class="infoCard"><h3>Payment safeguards</h3><p>Provider-hosted payment handling, verified webhooks, audit logs and role-based access controls.</p></article>
+ </div>
+ <div class="infoCard" style="margin-top:16px"><h3>Example production timeline · SmartGuard Backpack</h3>
+  <div class="milestone">Product concept <b>Completed</b></div><div class="milestone">Prototype <b>Completed</b></div><div class="milestone">Product testing <b>Completed</b></div><div class="milestone">Manufacturing <b style="color:var(--warn)">In progress</b></div><div class="milestone">Quality inspection <b style="color:var(--muted)">Pending</b></div><div class="milestone">Shipping and fulfillment <b style="color:var(--muted)">Pending</b></div>
+ </div>
+ <div class="disclaimer">Verification and milestone updates can reduce uncertainty, but they cannot guarantee that a project will succeed, meet its estimated timeline or deliver every reward.</div>
+</section>
+
+<!-- ROLE-BASED DASHBOARDS -->
+<section class="wrap section" id="dashboards">
+ <div class="sectionHead"><div><div class="mono">/ YOUR WORKSPACE</div><h2>Four views.<br><span class="script">One ecosystem.</span></h2></div><p>Role-based dashboards give each participant the tools and information relevant to their work.</p></div>
+ <div class="roleTabs" role="tablist"><button class="roleTab active" data-role="creator">Creator dashboard</button><button class="roleTab" data-role="backer">Backer dashboard</button><button class="roleTab" data-role="manufacturer">Manufacturer dashboard</button><button class="roleTab" data-role="admin">Admin dashboard</button></div>
+ <div class="dashboardMock" id="dashboardMock" aria-live="polite"><h3>Choose your workspace</h3><p style="font-size:12px;color:var(--muted)">Creator opens your saved work, Backer opens approved community campaigns, Manufacturer opens the partner enquiry form, and Admin is visible only to the platform owner.</p></div>
+</section>
+
+<!-- BUSINESS MODEL -->
+<section class="wrap section" id="business-model">
+ <div class="sectionHead"><div><div class="mono">/ A SUSTAINABLE PLATFORM</div><h2>Multiple paths<br><span class="script">to revenue.</span></h2></div><p>A planned SaaS plus marketplace business model, with fees disclosed clearly to customers.</p></div>
+ <div class="grid3">
+  <article class="infoCard"><h3>Crowdfunding commission</h3><p>Potential percentage fee on eligible successful campaigns, subject to transparent terms and payment costs.</p></article>
+  <article class="infoCard"><h3>AI Co-Founder Pro</h3><p>Optional monthly or annual subscription for higher usage and advanced AI workflows.</p></article>
+  <article class="infoCard"><h3>Premium creator tools</h3><p>Advanced campaign analytics, marketing utilities and workflow features.</p></article>
+  <article class="infoCard"><h3>Featured campaigns</h3><p>Clearly labeled sponsored placements that do not disguise paid promotion as organic ranking.</p></article>
+  <article class="infoCard"><h3>Manufacturer services</h3><p>Potential optional service or partnership fees, disclosed to both sides.</p></article>
+  <article class="infoCard"><h3>Business analytics</h3><p>Premium insights and reporting for creators and eligible business accounts.</p></article>
+ </div>
+ <div class="infoCard" style="margin-top:16px"><div class="demoLabel">Illustrative example only</div><h3>₹10,00,000 successful campaign × 5% = ₹50,000 gross platform commission</h3><p>This is not net profit. Payment processing, taxes, refunds, operating costs and any contractual obligations must be deducted and accounted for.</p></div>
+</section>
+
+<!-- CUSTOMER SEGMENTS & COMPETITIVE POSITION -->
+<section class="wrap section" id="audience">
+ <div class="sectionHead"><div><div class="mono">/ WHO WE BUILD FOR</div><h2>Built for makers,<br><span class="script">backers and builders.</span></h2></div><p>Start in India with focused categories and expand after validating demand and operations.</p></div>
+ <div class="grid3">
+  <article class="infoCard"><h3>Student innovators</h3><p>Students with prototypes and product ideas who need guidance, validation and early supporters.</p></article>
+  <article class="infoCard"><h3>Early-stage entrepreneurs</h3><p>Founders testing demand before investing heavily in production.</p></article>
+  <article class="infoCard"><h3>Independent designers</h3><p>Creators building electronics, accessories, lifestyle products and creative inventions.</p></article>
+  <article class="infoCard"><h3>Technology enthusiasts</h3><p>People who enjoy discovering and discussing emerging products.</p></article>
+  <article class="infoCard"><h3>Early adopters</h3><p>Supporters interested in backing new ideas and potentially receiving early rewards.</p></article>
+  <article class="infoCard"><h3>Manufacturers</h3><p>Production businesses seeking suitable partnerships with emerging product brands.</p></article>
+ </div>
+ <div class="sectionHead" style="margin-top:40px"><div><div class="mono">/ OUR POSITIONING</div><h2>Beyond the funding<br><span class="script">moment.</span></h2></div></div>
+ <div class="tableWrap"><table class="dataTable"><thead><tr><th>Capability</th><th>Traditional crowdfunding emphasis</th><th>Launchglass intended direction</th></tr></thead><tbody><tr><td>Raise funding</td><td>Core workflow</td><td>Reward-based campaigns</td></tr><tr><td>Idea validation</td><td>May be external</td><td>Integrated AI-assisted tools</td></tr><tr><td>Business planning</td><td>May be external</td><td>Editable AI-assisted plans</td></tr><tr><td>Campaign preparation</td><td>Creator-managed</td><td>AI-assisted campaign studio</td></tr><tr><td>Product previews</td><td>Images and video</td><td>Images, video and optional 3D</td></tr><tr><td>Production tracking</td><td>Creator updates</td><td>Structured milestones</td></tr><tr><td>Manufacturing network</td><td>Often external</td><td>Planned marketplace</td></tr><tr><td>Creator insights</td><td>Campaign analytics</td><td>Expanded analytics and AI guidance</td></tr></tbody></table></div>
+ <div class="disclaimer">This is intended product positioning, not an independently verified feature-by-feature audit of competing platforms.</div>
+</section>
+
+<!-- SUCCESS METRICS -->
+<section class="wrap section" id="metrics">
+ <div class="sectionHead"><div><div class="mono">/ MEASURE WHAT MATTERS</div><h2>Progress measured<br><span class="script">by real outcomes.</span></h2></div><p>Early success should be measured through creator and supporter behavior—not page views alone.</p></div>
+ <div class="grid4">
+  <article class="infoCard"><h3>Creator activation</h3><p>Registered creators, completed profiles and product concepts submitted.</p></article>
+  <article class="infoCard"><h3>Idea validation</h3><p>Validated concepts, research completion and meaningful customer feedback.</p></article>
+  <article class="infoCard"><h3>Campaign traction</h3><p>Published campaigns, interested backers and campaign-to-contribution conversion.</p></article>
+  <article class="infoCard"><h3>Funding outcomes</h3><p>Funding goal completion rate and verified contribution volume.</p></article>
+  <article class="infoCard"><h3>Creator retention</h3><p>Creators returning to improve, launch or manage another project.</p></article>
+  <article class="infoCard"><h3>Reward fulfillment</h3><p>Campaigns fulfilling rewards and communicating delays clearly.</p></article>
+  <article class="infoCard"><h3>Marketplace health</h3><p>Manufacturer response rate, quotation activity and production progress.</p></article>
+  <article class="infoCard"><h3>Business sustainability</h3><p>Revenue per active creator, subscription retention and support costs.</p></article>
+ </div>
+</section>
+
+<!-- TECH STACK AND SYSTEM ARCHITECTURE -->
+<section class="wrap section" id="technology">
+ <div class="sectionHead"><div><div class="mono">/ BUILT TO SCALE</div><h2>The technology<br><span class="script">behind Launchglass.</span></h2></div><p>Planned production architecture. The current uploaded file remains a standalone frontend demo.</p></div>
+ <div class="grid3">
+  <article class="infoCard"><h3>Frontend</h3><p>Next.js · TypeScript · Tailwind CSS · Framer Motion</p></article>
+  <article class="infoCard"><h3>Backend</h3><p>Python · FastAPI · REST API layer</p></article>
+  <article class="infoCard"><h3>Data & identity</h3><p>PostgreSQL · Firebase Authentication · role-based access</p></article>
+  <article class="infoCard"><h3>AI engine</h3><p>Gemini API accessed through secure backend endpoints</p></article>
+  <article class="infoCard"><h3>Payments</h3><p>Razorpay for India and PayPal or other providers for international use, subject to approval</p></article>
+  <article class="infoCard"><h3>Media & visualization</h3><p>Cloudinary or object storage · Three.js · Recharts</p></article>
+  <article class="infoCard"><h3>Deployment</h3><p>Vercel frontend · Render backend</p></article>
+  <article class="infoCard"><h3>Development workflow</h3><p>GitHub · environment-based secrets · automated testing and deployment</p></article>
+  <article class="infoCard"><h3>Security foundations</h3><p>HTTPS · validation · authorization · audit logs · webhook verification · backups</p></article>
+ </div>
+ <div class="architecture" style="margin-top:18px"><div class="archNode">USER · Creator / Backer / Manufacturer / Admin</div><div class="archArrow">↓</div><div class="archNode">NEXT.JS + TYPESCRIPT WEB APPLICATION</div><div class="archArrow">↓</div><div class="archNode">SECURE API LAYER · AUTHENTICATION · ROLE PERMISSIONS</div><div class="archArrow">↓</div><div class="archNode">PYTHON FASTAPI BACKEND</div><div class="grid3"><div class="archNode">POSTGRESQL<br><small>Users · Campaigns · Rewards · Orders</small></div><div class="archNode">GEMINI API<br><small>AI reports · Planning · Campaign tools</small></div><div class="archNode">PAYMENT PROVIDER<br><small>Payment events · Refunds · Payout records</small></div></div><div class="archArrow">↓</div><div class="archNode">MANUFACTURER MARKETPLACE · PRODUCTION · FULFILLMENT</div></div>
+</section>
+
+<!-- BUILD ROADMAP -->
+<section class="wrap section" id="roadmap">
+ <div class="sectionHead"><div><div class="mono">/ BUILD IN THE RIGHT ORDER</div><h2>From foundation<br><span class="script">to expansion.</span></h2></div><p>Prove real customer demand and operational readiness before taking on complex marketplace and payment systems.</p></div>
+ <div class="roadmap">
+  <article class="infoCard"><b class="mono">PHASE 01</b><h3>Startup foundation</h3><p>Brand, authentication, creator profiles, campaign database, campaign creation and discovery.</p><span class="chip">Goal: creators can publish concepts</span></article>
+  <article class="infoCard"><b class="mono">PHASE 02</b><h3>AI Co-Founder</h3><p>Idea analyzer, business plan, campaign builder, pricing assistant and marketing tools.</p><span class="chip">Goal: useful creator workflows</span></article>
+  <article class="infoCard"><b class="mono">PHASE 03</b><h3>Crowdfunding</h3><p>Rewards, payment integration, verified funding, backer dashboard and refund workflow.</p><span class="chip">Goal: compliant live transactions</span></article>
+  <article class="infoCard"><b class="mono">PHASE 04</b><h3>Trust & production</h3><p>Campaign verification, milestones, manufacturer marketplace, communication and disputes.</p><span class="chip">Goal: post-funding support</span></article>
+  <article class="infoCard"><b class="mono">PHASE 05</b><h3>Growth & expansion</h3><p>Recommendations, 3D experiences, analytics, subscriptions and internationalization.</p><span class="chip">Goal: scale responsibly</span></article>
+ </div>
+</section>
+
+<!-- FAQ / RESPONSIBILITY -->
+<section class="wrap section" id="responsibility">
+ <div class="sectionHead"><div><div class="mono">/ CLEAR EXPECTATIONS</div><h2>Trust starts with<br><span class="script">honest promises.</span></h2></div><p>Important principles for a platform handling campaigns, payments and product expectations.</p></div>
+ <div class="faq infoCard">
+  <details open><summary>Is Launchglass an investment platform?</summary><p>No. The initial plan is reward-based crowdfunding. Supporters do not receive company shares, equity or investment returns.</p></details>
+  <details><summary>Does a funded campaign guarantee delivery?</summary><p>No. Product development and manufacturing involve uncertainty. Campaigns must disclose risks, delivery estimates and creator responsibilities.</p></details>
+  <details><summary>Are payments live on this website?</summary><p>No. The uploaded HTML is a frontend demonstration. Live payments require backend integration, provider approval, compliant fund handling and tested refund and payout workflows.</p></details>
+  <details><summary>Are AI market findings verified?</summary><p>Not automatically. AI outputs must identify sourced facts, estimates and assumptions, and creators should verify important business decisions.</p></details>
+  <details><summary>Does manufacturer verification guarantee quality?</summary><p>No. Verification can confirm defined checks were completed, but it cannot guarantee a supplier's performance or the success of a production run.</p></details>
+ </div>
+</section>
+
+</main>
+
+
+<section class="wrap section" id="owner-console" hidden>
+ <div class="sectionHead"><div><div class="mono">/ RESTRICTED · OWNER ONLY</div><h2>Owner <span class="script">console.</span></h2></div><p>Private platform overview. Access is enforced by Supabase Row Level Security and the database owner registry.</p></div>
+ <div class="ownerStats" id="ownerStats"></div>
+ <div class="actionRow"><button class="btn primary" id="exportAllData" type="button">Export all platform data ↓</button><button class="btn" id="refreshAdmin" type="button">Refresh data ↻</button></div>
+ <div class="workspacePanel"><h3>Campaign review queue</h3><div id="adminCampaigns" class="workspaceList"></div></div>
+ <div class="workspacePanel"><h3>Registered users</h3><div id="adminUsers" class="ownerTableWrap"></div></div>
+ <div class="workspacePanel"><h3>Ideas and saved analyses</h3><div id="adminIdeas" class="ownerTableWrap"></div></div>
+ <div class="workspacePanel"><h3>Generated AI documents</h3><div id="adminAIDocs" class="ownerTableWrap"></div></div>
+ <div class="workspacePanel"><h3>Incoming enquiries</h3><div id="adminLeads" class="ownerTableWrap"></div></div>
+</section>
+
+<footer class="wrap">
+  <div class="footer">
+    <a class="brand" href="#">
+      <span class="mark">✦</span> launchglass.
+    </a>
+
+    <span>Creator tools · Community launches · © 2026 Launchglass</span>
+    <span>From idea to reality.</span>
+    <span class="creatorCredit">Created by <a href="mailto:pratyushbaghel688@gmail.com" aria-label="Email Pratyush via Gmail">Pratyush</a></span>
+  </div>
+</footer>
+
+<!-- MODAL -->
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+
+  <div class="modalBox glass">
+
+    <button class="close" onclick="closeModal()">×</button>
+
+    <div class="mono" id="modalKicker">START SOMETHING</div>
+
+    <h3 id="modalTitle">Bring your idea to life.</h3>
+
+    <p>
+      Send a request to the Launchglass team. Your message will be stored securely and visible to the platform owner.
+    </p>
+
+    <form id="demoForm">
+
+      <input name="name" id="leadName" placeholder="Your name" required maxlength="120">
+      <input name="email" id="leadEmail" type="email" placeholder="Email address" required maxlength="254">
+      <select name="request_type" id="leadType"><option value="creator">I’m a creator with an idea</option><option value="backer">I want to discover and support projects</option><option value="manufacturer">I’m a manufacturing partner</option><option value="general">General enquiry</option></select>
+      <textarea name="message" id="leadMessage" class="inputField" placeholder="Tell us a little about your request (optional)" maxlength="3000"></textarea>
+
+      <button class="btn primary" style="width:100%" type="submit">
+        Send enquiry ↗
+      </button>
+
+    </form>
+
+    <div id="message" style="font-size:10px;color:#61d7a7;margin-top:10px"></div>
+
+  </div>
+</div>
+
+<script>
+
+/* THanos SNAP THEME TOGGLE — standalone, reliable click handler. */
+(() => {
+  const body = document.body;
+  const pullTheme = document.getElementById('pullTheme');
+  const applyTheme = (light) => {
+    body.classList.toggle('light', Boolean(light));
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', light ? '#f4f0fa' : '#100d1b');
+    try { localStorage.setItem('launchglass-theme', light ? 'light' : 'dark'); } catch (_) {}
+    window.dispatchEvent(new CustomEvent('launchglass:themechange', {detail:{light:Boolean(light)}}));
+  };
+  try { if (localStorage.getItem('launchglass-theme') === 'light') applyTheme(true); } catch (_) {}
+  if (!pullTheme) return;
+  pullTheme.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    applyTheme(!body.classList.contains('light'));
+    pullTheme.classList.remove('snapping');
+    void pullTheme.offsetWidth;
+    pullTheme.classList.add('snapping');
+    window.setTimeout(() => pullTheme.classList.remove('snapping'), 900);
+  });
+})();
+
+/* FUNDING CALCULATOR */
+
+const goal = document.getElementById('goal');
+const processing = document.getElementById('processing');
+
+let withProcessing = true;
+
+const money = n =>
+  '₹' + Math.round(n).toLocaleString('en-IN');
+
+function calc() {
+
+  let g = +goal.value;
+  let platformFee = g * .05;
+  let processingFee = withProcessing ? g * .02 : 0;
+
+  document.getElementById('goalLabel').textContent =
+    money(g);
+
+  document.getElementById('net').textContent =
+    money(g - platformFee - processingFee);
+
+  document.getElementById('feeText').textContent =
+    `Platform estimate: ${money(platformFee)} · Processing estimate: ${money(processingFee)}. Not a payment quote.`;
+}
+
+goal.addEventListener('input', calc);
+
+processing.addEventListener('click', () => {
+
+  withProcessing = !withProcessing;
+
+  processing.classList.toggle('off', !withProcessing);
+
+  processing.setAttribute(
+    'aria-checked',
+    withProcessing
+  );
+
+  calc();
+});
+
+processing.addEventListener('keydown', e => {
+
+  if (e.key === 'Enter' || e.key === ' ') {
+
+    e.preventDefault();
+    processing.click();
+  }
+});
+
+
+/* MODAL */
+
+function openModal(type) {
+
+  document.getElementById('modal').classList.add('show');
+
+  document.getElementById('message').textContent = '';
+
+  document.getElementById('modalKicker').textContent =
+    type === 'signin' ? 'WELCOME BACK' : 'START SOMETHING';
+
+  document.getElementById('modalTitle').textContent =
+    type === 'signin'
+      ? 'Good ideas, continued.'
+      : 'Bring your idea to life.';
+}
+
+function closeModal() {
+
+  document.getElementById('modal').classList.remove('show');
+}
+
+document.getElementById('demoForm').addEventListener('submit', e => {
+
+  e.preventDefault();
+
+  document.getElementById('message').textContent =
+    'Demo interaction complete. No personal data has been sent or saved.';
+});
+
+
+/* 360 ROTATION, eased */
+const stage = document.getElementById('stage');
+const panel = document.getElementById('glassPanel');
+const REST = [7, -13, -4];
+let tgt = REST.slice(), cur = REST.slice(), hover = false;
+const RM = false; // Launchglass demo: keep requested visual animations enabled.
+function aim(e) {
+  const r = stage.getBoundingClientRect();
+  const x = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+  const y = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+  hover = true;
+  tgt = [(.5 - y) * 360, (x - .5) * 360, 0];
+}
+/* mouse and pen: the card turns toward the pointer, at any screen width */
+stage.addEventListener('pointermove', e => { if (e.pointerType !== 'touch') aim(e); });
+stage.addEventListener('pointerleave', e => { if (e.pointerType !== 'touch') hover = false; });
+/* touch: drag sideways across the card to spin it */
+let touching = false;
+stage.addEventListener('pointerdown', e => { if (e.pointerType === 'touch') { touching = true; aim(e); } });
+stage.addEventListener('pointermove', e => { if (e.pointerType === 'touch' && touching) aim(e); });
+const endTouch = e => { if (e.pointerType === 'touch') { touching = false; hover = false; } };
+stage.addEventListener('pointerup', endTouch);
+stage.addEventListener('pointercancel', endTouch);
+function pose() { panel.style.transform = 'rotateX(' + cur[0] + 'deg) rotateY(' + cur[1] + 'deg) rotateZ(' + cur[2] + 'deg)'; }
+(function spin(t) {
+  if (!hover) {
+    tgt = RM ? REST.slice() : [REST[0] + Math.sin(t / 1800) * 4, REST[1] + Math.cos(t / 2300) * 6, REST[2] + Math.sin(t / 2900) * 2];
+  }
+  for (let i = 0; i < 3; i++) cur[i] += (tgt[i] - cur[i]) * .09;
+  pose();
+  requestAnimationFrame(spin);
+})(0);
+
+
+/* INITIALIZE */
+
+calc();
+
+/* MOTION LAYER */
+(function () {
+  const fine = matchMedia('(pointer:fine)').matches;
+  requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.add('ready')));
+  function countUp(el) {
+    const to = parseFloat(el.textContent), t0 = performance.now();
+    if (isNaN(to)) return;
+    (function f(t) {
+      const p = Math.min(1, (t - t0) / 1400), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(to * e) + '%';
+      if (p < 1) requestAnimationFrame(f);
+    })(t0);
+  }
+  if (RM) {
+    document.querySelectorAll('.bar i').forEach(i => i.classList.add('f'));
+  } else {
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return;
+      const t = e.target; io.unobserve(t); t.classList.add('on');
+      const b = t.querySelector('.bar i'); if (b) b.classList.add('f');
+      t.querySelectorAll('.fund b').forEach(countUp);
+      setTimeout(() => { t.classList.remove('rv', 'on'); t.style.transitionDelay = ''; }, 1500);
+    }), { threshold: .15 });
+    document.querySelectorAll('.sectionHead,.stat,.campaign,.feature,.step,.calc,.cta').forEach(el => {
+      el.classList.add('rv');
+      el.style.transitionDelay = ([...el.parentNode.children].indexOf(el) % 4 * 90) + 'ms';
+      io.observe(el);
+    });
+  }
+  document.querySelectorAll('.glass').forEach(g => g.addEventListener('pointermove', e => {
+    const r = g.getBoundingClientRect();
+    g.style.setProperty('--mx', e.clientX - r.left + 'px');
+    g.style.setProperty('--my', e.clientY - r.top + 'px');
+  }));
+  if (fine && !RM) {
+    const c = document.getElementById('cursor');
+    let tx = innerWidth / 2, ty = innerHeight / 2, cx = tx, cy = ty, px = 0, py = 0, qx = 0, qy = 0;
+    addEventListener('pointermove', e => {
+      tx = e.clientX; ty = e.clientY; c.style.opacity = 1;
+      px = (e.clientX / innerWidth - .5) * 2; py = (e.clientY / innerHeight - .5) * 2;
+    });
+    (function loop() {
+      cx += (tx - cx) * .09; cy += (ty - cy) * .09; qx += (px - qx) * .06; qy += (py - qy) * .06;
+      c.style.transform = 'translate3d(' + cx + 'px,' + cy + 'px,0)';
+      stage.style.setProperty('--px', qx.toFixed(3)); stage.style.setProperty('--py', qy.toFixed(3));
+      requestAnimationFrame(loop);
+    })();
+    document.querySelectorAll('.btn').forEach(b => {
+      b.addEventListener('pointermove', e => {
+        const r = b.getBoundingClientRect();
+        b.style.translate = (e.clientX - r.left - r.width / 2) * .18 + 'px ' + (e.clientY - r.top - r.height / 2) * .28 + 'px';
+      });
+      b.addEventListener('pointerleave', () => { b.style.translate = ''; });
+    });
+  }
+  const pg = document.getElementById('progress'), nav = document.querySelector('.nav');
+  let tick = false;
+  function onS() {
+    tick = false;
+    const h = document.documentElement.scrollHeight - innerHeight;
+    pg.style.transform = 'scaleX(' + (h > 0 ? scrollY / h : 0) + ')';
+    nav.classList.toggle('scrolled', scrollY > 30);
+  }
+  addEventListener('scroll', () => { if (!tick) { tick = true; requestAnimationFrame(onS); } }, { passive: true });
+  onS();
+  addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  const _o = window.openModal;
+  window.openModal = function (t) { _o(t); setTimeout(() => { const i = document.querySelector('#demoForm input'); if (i) i.focus(); }, 80); };
+})();
+
+/* BOX ANIMATIONS */
+(function () {
+  if (RM) return;
+  const ease = p => 1 - Math.pow(1 - p, 3);
+  const sio = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('go'); sio.unobserve(e.target); }
+  }), { threshold: .3 });
+  document.querySelectorAll('.step').forEach(x => sio.observe(x));
+
+  function countNum(el) {
+    const m = el.textContent.match(/[\d,]+/);
+    if (!m) return;
+    const to = parseInt(m[0].replace(/,/g, ''), 10);
+    const pre = el.textContent.slice(0, m.index), post = el.textContent.slice(m.index + m[0].length);
+    const t0 = performance.now();
+    (function f(t) {
+      const p = Math.min(1, (t - t0) / 1500);
+      el.textContent = pre + Math.round(to * ease(p)).toLocaleString('en-IN') + post;
+      if (p < 1) requestAnimationFrame(f);
+    })(t0);
+  }
+  const cio = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    cio.unobserve(e.target);
+    e.target.querySelectorAll('.fund span,.campaignMeta span').forEach(countNum);
+  }), { threshold: .15 });
+  document.querySelectorAll('.campaign').forEach(c => cio.observe(c));
+
+  const net = document.getElementById('net'), total = document.querySelector('.total');
+  const parse = s => parseInt(s.replace(/[^\d]/g, ''), 10) || 0;
+  let shown = parse(net.textContent), tok = 0;
+  const opts = { childList: true, characterData: true, subtree: true };
+  function write(v) { mo.disconnect(); net.textContent = money(v); shown = v; mo.observe(net, opts); }
+  function run(to) {
+    const my = ++tok, from = shown, t0 = performance.now();
+    (function f(t) {
+      if (my !== tok) return;
+      const p = Math.min(1, (t - t0) / 450);
+      write(from + (to - from) * ease(p));
+      if (p < 1) requestAnimationFrame(f);
+    })(t0);
+  }
+  const mo = new MutationObserver(() => {
+    const to = parse(net.textContent);
+    write(shown);
+    run(to);
+    total.classList.remove('pulse'); void total.offsetWidth; total.classList.add('pulse');
+  });
+  mo.observe(net, opts);
+})();
+
+
+
+/* EXTRA ECOSYSTEM REVEALS — scroll-triggered and touch-friendly */
+(function(){
+  const targets = document.querySelectorAll('.ecosystemSection, .dashPanel, .toolCard, .trustCard, .roadmapItem, .revenueCard, .manufacturerCard, .discoveryCard');
+  targets.forEach((el,i)=>{ el.classList.add('motionReveal'); el.style.setProperty('--reveal-delay', (i%5)*85+'ms'); });
+  const show = el => el.classList.add('motionVisible');
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries=>entries.forEach(entry=>{
+      if(entry.isIntersecting){ show(entry.target); observer.unobserve(entry.target); }
+    }),{threshold:.08, rootMargin:'0px 0px -30px 0px'});
+    targets.forEach(el=>observer.observe(el));
+  } else { targets.forEach(show); }
+})();
+
+/* LAUNCHGLASS PRESENTATION INTERACTIONS — data actions live in app.js */
+(function(){
+ document.querySelectorAll('.filterBtn').forEach(btn=>btn.addEventListener('click',()=>{
+  document.querySelectorAll('.filterBtn').forEach(b=>b.classList.toggle('active',b===btn));
+  const f=btn.dataset.filter;
+  document.querySelectorAll('.discoveryCard').forEach(card=>card.style.display=(f==='all'||card.dataset.category===f)?'block':'none');
+ }));
+ const scene=document.getElementById('productScene'),obj=document.getElementById('productObject');
+ if(scene&&obj){scene.addEventListener('pointermove',e=>{const r=scene.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;obj.style.setProperty('--ry',((x-.5)*65)+'deg');obj.style.setProperty('--rx',((.5-y)*35)+'deg');});scene.addEventListener('pointerleave',()=>{obj.style.setProperty('--ry','22deg');obj.style.setProperty('--rx','-8deg');});}
+ document.querySelectorAll('.roleTab').forEach(btn=>btn.addEventListener('click',()=>{
+  document.querySelectorAll('.roleTab').forEach(b=>b.classList.toggle('active',b===btn));
+  const box=document.getElementById('dashboardMock');
+  if(box) box.innerHTML='<h3>Live workspace</h3><p>Use the private workspace below for your saved records. Backer and manufacturer activity is stored when you submit an enquiry or follow an approved campaign.</p><a class="btn primary" href="#my-workspace">Open my workspace ↓</a>';
+ }));
+})();
+
+</script>
+<script src="./config.js"></script>
+<script type="module" src="./app.js"></script>
+
+<!-- Self-contained Thanos gauntlet artwork: no external 3D library or CDN required. -->
+</div><!-- /appShell -->
+<div id="appNotice" class="appNotice" role="status" aria-live="polite"></div>
+</body>
+</html>
