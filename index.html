@@ -1140,6 +1140,26 @@ textarea.inputField{min-height:110px;resize:vertical}
 #campaignResult,#ideaResult{white-space:pre-wrap;line-height:1.7}
 @media(max-width:760px){.liveCampaignGrid{grid-template-columns:1fr}.ownerStats{grid-template-columns:repeat(2,minmax(0,1fr))}.accountChip{display:none}}
 
+
+/* Phase 2 — searchable, filterable campaign discovery */
+.discoveryControls{display:grid;grid-template-columns:minmax(220px,2fr) minmax(160px,1fr) minmax(180px,1fr);gap:10px;margin:18px 0 8px}
+.discoveryControls .inputField{min-width:0}
+.liveCampaignCard{overflow:hidden;padding:0;display:flex;flex-direction:column}
+.liveCampaignCover{width:100%;height:180px;object-fit:cover;background:linear-gradient(135deg,rgba(85,110,255,.25),rgba(22,23,54,.8))}
+.liveCampaignCoverFallback{height:120px;display:grid;place-items:center;font-size:42px;background:radial-gradient(circle at 30% 20%,rgba(105,130,255,.45),transparent 55%),var(--surface)}
+.liveCampaignContent{padding:18px;display:flex;flex-direction:column;align-items:flex-start;flex:1}
+.liveCampaignContent .campaignCardActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:14px}
+.liveCampaignContent .campaignCardActions .btn{margin-top:0}
+.campaignDetailDialog{width:min(720px,calc(100% - 28px));max-height:88vh;overflow:auto;border:1px solid var(--line);border-radius:22px;padding:0;background:var(--surface);color:var(--text);box-shadow:0 24px 90px #0009}
+.campaignDetailDialog::backdrop{background:#050713c9;backdrop-filter:blur(8px)}
+.campaignDetailInner{padding:26px;position:relative}
+.campaignDetailInner>img{width:100%;max-height:300px;object-fit:cover;border-radius:15px;margin:8px 0 18px}
+.campaignDetailInner h3{font-size:clamp(24px,4vw,36px);margin:12px 0}
+.campaignDetailMeta,.campaignDetailReward{color:var(--muted);font-size:13px;line-height:1.7}
+.campaignDetailStory{white-space:pre-wrap;line-height:1.8;font-size:14px;margin:20px 0}
+.campaignDetailClose{float:right;margin-left:10px}
+@media(max-width:760px){.discoveryControls{grid-template-columns:1fr}.campaignDetailInner{padding:18px}}
+
 </style>
 </head>
 
@@ -1732,7 +1752,14 @@ textarea.inputField{min-height:110px;resize:vertical}
 </section>
 
 <!-- 3D PRODUCT PREVIEW -->
-<div class="wrap" style="margin-top:20px"><div class="sectionHead"><div><div class="mono">/ COMMUNITY LAUNCHES</div><h2>Live <span class="script">campaigns.</span></h2></div><p>Campaigns approved by the Launchglass owner appear here. This MVP does not collect payments.</p></div><div id="liveCampaigns" class="liveCampaignGrid"><p style="color:var(--muted);font-size:12px">Loading approved campaigns…</p></div></div>
+<div class="wrap" style="margin-top:20px"><div class="sectionHead"><div><div class="mono">/ COMMUNITY LAUNCHES</div><h2>Live <span class="script">campaigns.</span></h2></div><p>Campaigns approved by the Launchglass owner appear here. This MVP does not collect payments.</p></div><div class="discoveryControls" aria-label="Campaign discovery controls">
+ <input id="campaignSearch" class="inputField" type="search" placeholder="Search products, creators or stories…" aria-label="Search approved campaigns">
+ <select id="campaignCategoryFilter" class="inputField" aria-label="Filter campaigns by category"><option value="all">All categories</option></select>
+ <select id="campaignSort" class="inputField" aria-label="Sort campaigns"><option value="newest">Newest first</option><option value="goal-low">Funding goal: low to high</option><option value="goal-high">Funding goal: high to low</option><option value="name">Name A–Z</option></select>
+</div>
+<p id="campaignResultCount" class="mono" aria-live="polite">Loading approved campaigns…</p>
+<div id="liveCampaigns" class="liveCampaignGrid"><p style="color:var(--muted);font-size:12px">Loading approved campaigns…</p></div>
+<dialog id="campaignDetailDialog" class="campaignDetailDialog" aria-labelledby="campaignDetailTitle"><div class="campaignDetailInner"><button class="btn campaignDetailClose" id="closeCampaignDetail" type="button" aria-label="Close campaign details">✕</button><img id="campaignDetailImage" alt="" hidden><span class="chip" id="campaignDetailCategory"></span><h3 id="campaignDetailTitle"></h3><p class="campaignDetailMeta" id="campaignDetailMeta"></p><div id="campaignDetailStory" class="campaignDetailStory"></div><p id="campaignDetailReward" class="campaignDetailReward"></p><button class="btn primary" id="campaignDetailFollow" type="button">Follow campaign</button></div></dialog></div>
 
 <section class="wrap section" id="product-preview">
  <div class="sectionHead"><div><div class="mono">/ SEE THE PRODUCT FROM EVERY ANGLE</div><h2>Products, beyond<br><span class="script">flat images.</span></h2></div><p>Interactive 3D previews are planned for campaigns that provide a supported model.</p></div>

@@ -144,7 +144,7 @@ function campaignForm() {
   const goal=Number($('campaignGoal').value), days=Number($('campaignDays').value);
   const reward=$('campaignReward').value.trim(), category=$('campaignCategory').value;
   if (!name || story.length<20 || !Number.isFinite(goal) || goal<=0 || !Number.isInteger(days) || days<1 || days>90 || !category) throw new Error('Complete the name, a story of at least 20 characters, a positive funding goal, 1–90 days and a category.');
-  return {name,story,goal,duration_days:days,reward,category,image_url:window.launchglassCampaignImageUrl || null};
+  return {name,story,goal,duration_days:days,reward,category,image_url:window.launchglassCampaignImageUrl||null};
 }
 $('previewCampaign')?.addEventListener('click', () => {
   const box=$('campaignResult');
@@ -168,57 +168,24 @@ $('generateCampaignCopy')?.addEventListener('click', async () => {
 });
 
 
-// Phase 1: user-owned campaign cover uploads to Supabase Storage.
+// Phase 1 support: persistent profile and campaign cover uploads.
 window.launchglassCampaignImageUrl = null;
-$('uploadCampaignImage')?.addEventListener('click', () => $('campaignImage')?.click());
-$('campaignImage')?.addEventListener('change', async (event) => {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  if (!(await requireClient())) { event.target.value=''; return; }
-  if (!/^image\/(jpeg|png|webp)$/.test(file.type)) { notify('Choose a JPG, PNG or WebP image.'); event.target.value=''; return; }
-  if (file.size > 5 * 1024 * 1024) { notify('Image must be 5 MB or smaller.'); event.target.value=''; return; }
-  const button = $('uploadCampaignImage'); setBusy(button, true, 'Uploading…');
-  try {
-    const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
-    const path = `${currentUser.id}/${crypto.randomUUID()}.${ext}`;
-    const { error } = await supabase.storage.from('campaign-media').upload(path, file, {cacheControl:'3600',upsert:false,contentType:file.type});
-    if (error) throw error;
-    const { data } = supabase.storage.from('campaign-media').getPublicUrl(path);
-    window.launchglassCampaignImageUrl = data.publicUrl;
-    $('campaignImagePreview').src = data.publicUrl; $('campaignImagePreview').hidden = false;
-    notify('Image uploaded. Save the campaign draft to attach it.');
-  } catch (e) { notify('Image upload failed: ' + e.message); }
-  finally { setBusy(button, false); }
+$('uploadCampaignImage')?.addEventListener('click',()=> $('campaignImage')?.click());
+$('campaignImage')?.addEventListener('change',async e=>{
+ const file=e.target.files?.[0]; if(!file)return;
+ if(!(await requireClient())){e.target.value='';return;}
+ if(!/^image\/(jpeg|png|webp)$/.test(file.type)){notify('Choose a JPG, PNG or WebP image.');e.target.value='';return;}
+ if(file.size>5*1024*1024){notify('Image must be 5 MB or smaller.');e.target.value='';return;}
+ const btn=$('uploadCampaignImage');setBusy(btn,true,'Uploading…');
+ try{const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';const path=`${currentUser.id}/${crypto.randomUUID()}.${ext}`;
+  const {error}=await supabase.storage.from('campaign-media').upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type});if(error)throw error;
+  const {data}=supabase.storage.from('campaign-media').getPublicUrl(path);window.launchglassCampaignImageUrl=data.publicUrl;
+  $('campaignImagePreview').src=data.publicUrl;$('campaignImagePreview').hidden=false;notify('Image uploaded. Save your draft to attach it.');
+ }catch(err){notify('Image upload failed: '+err.message);}finally{setBusy(btn,false);}
 });
-
-// Phase 1: persistent editable profile.
-async function loadMyProfile() {
-  if (!supabase || !currentUser) return;
-  const {data,error}=await supabase.from('profiles').select('email,full_name,bio,website,account_type').eq('id',currentUser.id).maybeSingle();
-  if(error){notify('Profile could not load: '+error.message);return;}
-  if(!data)return;
-  $('profileEmail').textContent=data.email||currentUser.email||'';
-  $('profileFullName').value=data.full_name||currentUser.user_metadata?.full_name||currentUser.user_metadata?.name||'';
-  $('profileBio').value=data.bio||''; $('profileWebsite').value=data.website||'';
-  $('profileType').value=data.account_type||'creator';
-}
-$('saveProfile')?.addEventListener('click',async()=>{
-  if(!(await requireClient()))return;
-  const full_name=$('profileFullName').value.trim().slice(0,120);
-  const bio=$('profileBio').value.trim().slice(0,500);
-  const raw=$('profileWebsite').value.trim();
-  const account_type=$('profileType').value;
-  if(!full_name){notify('Enter your display name.');return;}
-  let website=null;
-  if(raw){try{const u=new URL(raw);if(!['http:','https:'].includes(u.protocol))throw 0;website=u.href;}catch{notify('Enter a valid https:// website URL.');return;}}
-  const b=$('saveProfile');setBusy(b,true,'Saving…');
-  try{
-    const {error}=await supabase.from('profiles').update({full_name,bio,website,account_type}).eq('id',currentUser.id);
-    if(error)throw error;
-    $('accountChip').textContent=full_name;notify('Profile saved.');
-  }catch(e){notify('Profile save failed: '+e.message);}
-  finally{setBusy(b,false);}
-});
+async function loadMyProfile(){if(!supabase||!currentUser)return;const {data,error}=await supabase.from('profiles').select('email,full_name,bio,website,account_type').eq('id',currentUser.id).maybeSingle();if(error){notify('Profile could not load: '+error.message);return;}if(!data)return;
+ $('profileEmail').textContent=data.email||currentUser.email||'';$('profileFullName').value=data.full_name||currentUser.user_metadata?.full_name||currentUser.user_metadata?.name||'';$('profileBio').value=data.bio||'';$('profileWebsite').value=data.website||'';$('profileType').value=data.account_type||'creator';}
+$('saveProfile')?.addEventListener('click',async()=>{if(!(await requireClient()))return;const full_name=$('profileFullName').value.trim().slice(0,120),bio=$('profileBio').value.trim().slice(0,500),raw=$('profileWebsite').value.trim(),account_type=$('profileType').value;if(!full_name){notify('Enter your display name.');return;}let website=null;if(raw){try{const u=new URL(raw);if(!['http:','https:'].includes(u.protocol))throw 0;website=u.href;}catch{notify('Enter a valid https:// website URL.');return;}}const b=$('saveProfile');setBusy(b,true,'Saving…');try{const {error}=await supabase.from('profiles').update({full_name,bio,website,account_type}).eq('id',currentUser.id);if(error)throw error;$('accountChip').textContent=full_name;notify('Profile saved.');}catch(e){notify('Profile save failed: '+e.message);}finally{setBusy(b,false);}});
 
 async function saveCampaign(showToast=true) {
   if (!(await requireClient())) throw new Error('Sign in is required.');
@@ -293,17 +260,29 @@ async function loadWorkspace() {
   finally { loadingWorkspace=false; }
 }
 
-async function loadPublicCampaigns() {
-  if(!supabase) return;
-  const box=$('liveCampaigns');
-  try {
-    const {data,error}=await supabase.from('campaigns').select('id,name,story,goal,duration_days,category,created_at').eq('status','approved').order('created_at',{ascending:false}).limit(18);
-    if(error) throw error;
-    if(!data.length){box.innerHTML='<p class="mono">No approved community campaigns yet. Submitted campaigns appear here after owner review.</p>';return;}
-    box.innerHTML=data.map(c=>`<article class="liveCampaignCard"><span class="chip">${escapeHTML(c.category)}</span><h3>${escapeHTML(c.name)}</h3><p>${escapeHTML(c.story.slice(0,190))}${c.story.length>190?'…':''}</p><div class="mono">GOAL · ₹${Number(c.goal).toLocaleString('en-IN')} · ${c.duration_days} DAYS</div><button class="btn primary" data-follow-campaign="${c.id}" type="button">Follow campaign</button></article>`).join('');
-    box.querySelectorAll('[data-follow-campaign]').forEach(button=>button.addEventListener('click',()=>toggleInterest(button.dataset.followCampaign,button)));
-  } catch(e){box.innerHTML='<p class="mono">Campaigns could not be loaded. Check the Supabase table setup.</p>';}
+let publicCampaignCache=[];
+let followedCampaignIds=new Set();
+function renderPublicCampaigns(){
+ const box=$('liveCampaigns');if(!box)return;
+ const query=($('campaignSearch')?.value||'').trim().toLowerCase();const category=$('campaignCategoryFilter')?.value||'all';const sort=$('campaignSort')?.value||'newest';
+ let rows=publicCampaignCache.filter(c=>(category==='all'||c.category===category)&&(!query||[c.name,c.story,c.category].some(v=>String(v||'').toLowerCase().includes(query))));
+ rows.sort((x,y)=>sort==='goal-low'?Number(x.goal)-Number(y.goal):sort==='goal-high'?Number(y.goal)-Number(x.goal):sort==='name'?x.name.localeCompare(y.name):new Date(y.created_at)-new Date(x.created_at));
+ $('campaignResultCount').textContent=`${rows.length} approved campaign${rows.length===1?'':'s'} found`;
+ if(!rows.length){box.innerHTML='<p class="mono">No approved campaigns match your search yet. Try another keyword or category.</p>';return;}
+ box.innerHTML=rows.map(c=>`<article class="liveCampaignCard">${c.image_url?`<img class="liveCampaignCover" src="${escapeHTML(c.image_url)}" alt="Cover image for ${escapeHTML(c.name)}" loading="lazy">`:`<div class="liveCampaignCoverFallback" aria-hidden="true">✧</div>`}<div class="liveCampaignContent"><span class="chip">${escapeHTML(c.category)}</span><h3>${escapeHTML(c.name)}</h3><p>${escapeHTML(c.story.slice(0,170))}${c.story.length>170?'…':''}</p><div class="mono">GOAL · ₹${Number(c.goal).toLocaleString('en-IN')} · ${c.duration_days} DAYS</div><div class="campaignCardActions"><button class="btn" data-view-campaign="${c.id}" type="button">View details</button><button class="btn primary" data-follow-campaign="${c.id}" type="button">${followedCampaignIds.has(c.id)?'Following ✓':'Follow campaign'}</button></div></div></article>`).join('');
+ box.querySelectorAll('[data-follow-campaign]').forEach(b=>b.addEventListener('click',()=>toggleInterest(b.dataset.followCampaign,b)));
+ box.querySelectorAll('[data-view-campaign]').forEach(b=>b.addEventListener('click',()=>openCampaignDetail(b.dataset.viewCampaign)));
 }
+function openCampaignDetail(id){const c=publicCampaignCache.find(x=>x.id===id);if(!c)return;const dlg=$('campaignDetailDialog');$('campaignDetailTitle').textContent=c.name;$('campaignDetailCategory').textContent=c.category;$('campaignDetailMeta').textContent=`Funding goal ₹${Number(c.goal).toLocaleString('en-IN')} · ${c.duration_days} days · Published ${new Date(c.created_at).toLocaleDateString('en-IN')}`;$('campaignDetailStory').textContent=c.story;$('campaignDetailReward').textContent=c.reward?`Potential reward: ${c.reward}`:'Reward details have not been provided.';const img=$('campaignDetailImage');img.src=c.image_url||'';img.hidden=!c.image_url;const follow=$('campaignDetailFollow');follow.dataset.followCampaign=c.id;follow.textContent=followedCampaignIds.has(c.id)?'Following ✓':'Follow campaign';follow.onclick=()=>toggleInterest(c.id,follow);if(typeof dlg.showModal==='function')dlg.showModal();else dlg.setAttribute('open','');}
+$('closeCampaignDetail')?.addEventListener('click',()=> $('campaignDetailDialog')?.close());
+$('campaignDetailDialog')?.addEventListener('click',e=>{if(e.target===$('campaignDetailDialog'))$('campaignDetailDialog').close();});
+['campaignSearch','campaignCategoryFilter','campaignSort'].forEach(id=>$(id)?.addEventListener(id==='campaignSearch'?'input':'change',renderPublicCampaigns));
+async function loadPublicCampaigns(){if(!supabase)return;const box=$('liveCampaigns');try{
+ const {data,error}=await supabase.from('campaigns').select('id,name,story,goal,duration_days,category,reward,image_url,created_at').eq('status','approved').order('created_at',{ascending:false}).limit(100);if(error)throw error;publicCampaignCache=data||[];
+ const select=$('campaignCategoryFilter');if(select){const previous=select.value;const categories=[...new Set(publicCampaignCache.map(c=>c.category).filter(Boolean))].sort();select.innerHTML='<option value="all">All categories</option>'+categories.map(c=>`<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');if(categories.includes(previous))select.value=previous;}
+ if(currentUser){const {data:followed,error:followError}=await supabase.from('campaign_interests').select('campaign_id').eq('user_id',currentUser.id);if(followError)throw followError;followedCampaignIds=new Set((followed||[]).map(x=>x.campaign_id));}else followedCampaignIds=new Set();
+ renderPublicCampaigns();
+ }catch(e){box.innerHTML=`<p class="mono">Campaigns could not be loaded: ${escapeHTML(e.message)}</p>`;$('campaignResultCount').textContent='Campaign discovery unavailable';}}
 async function toggleInterest(campaignId,button) {
   if(!(await requireClient())) return;
   setBusy(button,true,'Saving…');
@@ -312,7 +291,7 @@ async function toggleInterest(campaignId,button) {
     if(error) throw error;
     if(data){const del=await supabase.from('campaign_interests').delete().eq('id',data.id);if(del.error)throw del.error;notify('Removed from your followed campaigns.');}
     else {const ins=await supabase.from('campaign_interests').insert({campaign_id:campaignId,user_id:currentUser.id});if(ins.error)throw ins.error;notify('Campaign added to your workspace.');}
-    await loadWorkspace();
+    await loadWorkspace(); await loadPublicCampaigns();
   } catch(e){notify(e.message);}
   finally{setBusy(button,false);}
 }
@@ -438,8 +417,7 @@ function attachWorkspaceActions() {
     $('campaignName').value=data.name; $('campaignStory').value=data.story;
     $('campaignGoal').value=data.goal; $('campaignDays').value=data.duration_days;
     $('campaignReward').value=data.reward||''; $('campaignCategory').value=data.category;
-    window.launchglassCampaignImageUrl=data.image_url||null;
-    if($('campaignImagePreview')){$('campaignImagePreview').src=data.image_url||'';$('campaignImagePreview').hidden=!data.image_url;}
+    window.launchglassCampaignImageUrl=data.image_url||null; if($('campaignImagePreview')){$('campaignImagePreview').src=data.image_url||'';$('campaignImagePreview').hidden=!data.image_url;}
     location.hash='#campaign-builder'; notify('Draft loaded into the campaign builder.');
   }));
   document.querySelectorAll('[data-delete-idea]').forEach(button=>button.addEventListener('click',async()=>{
