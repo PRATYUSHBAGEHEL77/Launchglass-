@@ -439,7 +439,20 @@ async function loadManufacturingPortal(){
   let query=supabase.from('manufacturing_requests').select('id,creator_id,campaign_id,category,quantity,needed_by,description,status,created_at').eq('status','open').order('created_at',{ascending:false}).limit(100);
   const {data,error}=await query;if(error)throw error;
   const requests=(data||[]).filter(r=>r.creator_id===currentUser.id||isVerified);
-  reqBox.innerHTML=requests.length?requests.map(r=>`<article class="manufacturerCard"><h4>${escapeHTML(r.category)} · ${Number(r.quantity).toLocaleString('en-IN')} units</h4><div class="manufacturerMeta"><span>${r.creator_id===currentUser.id?'YOUR REQUEST':'OPEN RFQ'}</span><span>${new Date(r.created_at).toLocaleDateString('en-IN')}</span>${r.needed_by?`<span>NEEDED BY ${escapeHTML(r.needed_by)}</span>`:''}</div><p>${escapeHTML(r.description)}</p>${isVerified&&r.creator_id!==currentUser.id?`<button class="btn primary" data-quote-request="${r.id}">Submit quotation</button>`:''}</article>`).join(''):'<p class="mono">${isVerified?'No open quotation requests yet.':'Your requests appear here. Only verified manufacturers can view other creators’ open requests.'}</p>';
+  if(requests.length){
+   reqBox.innerHTML = requests.map(function(r){
+    var own = r.creator_id === currentUser.id;
+    var dateText = new Date(r.created_at).toLocaleDateString('en-IN');
+    var dueText = r.needed_by ? '<span>NEEDED BY ' + escapeHTML(r.needed_by) + '</span>' : '';
+    var quoteButton = (isVerified && !own) ? '<button class="btn primary" data-quote-request="' + escapeHTML(r.id) + '">Submit quotation</button>' : '';
+    return '<article class="manufacturerCard">' +
+     '<h4>' + escapeHTML(r.category) + ' · ' + Number(r.quantity).toLocaleString('en-IN') + ' units</h4>' +
+     '<div class="manufacturerMeta"><span>' + (own ? 'YOUR REQUEST' : 'OPEN RFQ') + '</span><span>' + escapeHTML(dateText) + '</span>' + dueText + '</div>' +
+     '<p>' + escapeHTML(r.description) + '</p>' + quoteButton + '</article>';
+   }).join('');
+  } else {
+   reqBox.innerHTML = '<p class="mono">' + (isVerified ? 'No open quotation requests yet.' : 'Your requests appear here. Only verified manufacturers can view other creators open requests.') + '</p>';
+  }
   reqBox.querySelectorAll('[data-quote-request]').forEach(b=>b.addEventListener('click',()=>openQuoteForm(b.dataset.quoteRequest)));
  }catch(e){reqBox.innerHTML=`<p class="mono">Requests unavailable: ${escapeHTML(e.message)}</p>`;}
  const {data:mine,error:me}=await supabase.from('manufacturing_requests').select('id,category,quantity,status,created_at').eq('creator_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
