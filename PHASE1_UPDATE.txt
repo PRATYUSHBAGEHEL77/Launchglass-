@@ -1,0 +1,14 @@
+LAUNCHGLASS V2 — PHASE 1 UPDATE
+
+Added:
+- Editable profile: display name, account type, bio, website.
+- Campaign cover upload: JPG/PNG/WebP, maximum 5 MB.
+- Campaign cover URL saved with campaign draft.
+- Supabase Storage bucket and per-user folder policies.
+
+Since the original schema has already been run, execute:
+supabase/migrations/2026-11-15-launchglass-v2.sql
+
+Then push updated index.html and app.js to GitHub and redeploy Render.
+Keep your existing configured config.js. The config.js in this ZIP is a placeholder.
+Never expose service_role, Supabase Secret, Google Client Secret or Gemini API key.

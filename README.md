@@ -130,3 +130,8 @@ Then visit `http://localhost:5500` after adding the local URL to Supabase Redire
 - **Owner Console missing:** sign in once with the intended account, run the owner SQL insert, then refresh.
 - **Campaigns not visible publicly:** only campaigns with status `approved` are shown; submitted campaigns must be approved by the owner.
 - **Data access denied:** confirm `schema.sql` ran successfully and do not disable RLS to “fix” permission errors.
+
+
+## Launchglass V2 Phase 1 update (for an existing database)
+
+Since the original `supabase/schema.sql` has already been executed, do **not** rerun it. Run the additive migration `supabase/migrations/2026-11-15-launchglass-v2.sql` in Supabase SQL Editor. It adds editable profile fields, campaign cover image storage and the related access policies. Then push the updated `index.html` and `app.js` to GitHub and redeploy Render. Keep your already-configured local `config.js` with your own Supabase Project URL and publishable key; do not overwrite it with the placeholder in this ZIP.

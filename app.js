@@ -42,6 +42,7 @@ function setAuthenticatedUI(user) {
     $('authMessage').textContent = '';
     loadWorkspace();
     loadPublicCampaigns();
+    loadMyProfile();
     checkAdmin();
   }
 }
@@ -143,7 +144,7 @@ function campaignForm() {
   const goal=Number($('campaignGoal').value), days=Number($('campaignDays').value);
   const reward=$('campaignReward').value.trim(), category=$('campaignCategory').value;
   if (!name || story.length<20 || !Number.isFinite(goal) || goal<=0 || !Number.isInteger(days) || days<1 || days>90 || !category) throw new Error('Complete the name, a story of at least 20 characters, a positive funding goal, 1–90 days and a category.');
-  return {name,story,goal,duration_days:days,reward,category};
+  return {name,story,goal,duration_days:days,reward,category,image_url:window.launchglassCampaignImageUrl || null};
 }
 $('previewCampaign')?.addEventListener('click', () => {
   const box=$('campaignResult');
@@ -164,6 +165,59 @@ $('generateCampaignCopy')?.addEventListener('click', async () => {
     box.textContent='Gemini drafted a campaign story. Review and edit it before saving.'; box.classList.add('show');
   } catch(e){box.textContent=e.message;box.classList.add('show');}
   finally{setBusy($('generateCampaignCopy'),false);}
+});
+
+
+// Phase 1: user-owned campaign cover uploads to Supabase Storage.
+window.launchglassCampaignImageUrl = null;
+$('uploadCampaignImage')?.addEventListener('click', () => $('campaignImage')?.click());
+$('campaignImage')?.addEventListener('change', async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  if (!(await requireClient())) { event.target.value=''; return; }
+  if (!/^image\/(jpeg|png|webp)$/.test(file.type)) { notify('Choose a JPG, PNG or WebP image.'); event.target.value=''; return; }
+  if (file.size > 5 * 1024 * 1024) { notify('Image must be 5 MB or smaller.'); event.target.value=''; return; }
+  const button = $('uploadCampaignImage'); setBusy(button, true, 'Uploading…');
+  try {
+    const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+    const path = `${currentUser.id}/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from('campaign-media').upload(path, file, {cacheControl:'3600',upsert:false,contentType:file.type});
+    if (error) throw error;
+    const { data } = supabase.storage.from('campaign-media').getPublicUrl(path);
+    window.launchglassCampaignImageUrl = data.publicUrl;
+    $('campaignImagePreview').src = data.publicUrl; $('campaignImagePreview').hidden = false;
+    notify('Image uploaded. Save the campaign draft to attach it.');
+  } catch (e) { notify('Image upload failed: ' + e.message); }
+  finally { setBusy(button, false); }
+});
+
+// Phase 1: persistent editable profile.
+async function loadMyProfile() {
+  if (!supabase || !currentUser) return;
+  const {data,error}=await supabase.from('profiles').select('email,full_name,bio,website,account_type').eq('id',currentUser.id).maybeSingle();
+  if(error){notify('Profile could not load: '+error.message);return;}
+  if(!data)return;
+  $('profileEmail').textContent=data.email||currentUser.email||'';
+  $('profileFullName').value=data.full_name||currentUser.user_metadata?.full_name||currentUser.user_metadata?.name||'';
+  $('profileBio').value=data.bio||''; $('profileWebsite').value=data.website||'';
+  $('profileType').value=data.account_type||'creator';
+}
+$('saveProfile')?.addEventListener('click',async()=>{
+  if(!(await requireClient()))return;
+  const full_name=$('profileFullName').value.trim().slice(0,120);
+  const bio=$('profileBio').value.trim().slice(0,500);
+  const raw=$('profileWebsite').value.trim();
+  const account_type=$('profileType').value;
+  if(!full_name){notify('Enter your display name.');return;}
+  let website=null;
+  if(raw){try{const u=new URL(raw);if(!['http:','https:'].includes(u.protocol))throw 0;website=u.href;}catch{notify('Enter a valid https:// website URL.');return;}}
+  const b=$('saveProfile');setBusy(b,true,'Saving…');
+  try{
+    const {error}=await supabase.from('profiles').update({full_name,bio,website,account_type}).eq('id',currentUser.id);
+    if(error)throw error;
+    $('accountChip').textContent=full_name;notify('Profile saved.');
+  }catch(e){notify('Profile save failed: '+e.message);}
+  finally{setBusy(b,false);}
 });
 
 async function saveCampaign(showToast=true) {
@@ -384,6 +438,8 @@ function attachWorkspaceActions() {
     $('campaignName').value=data.name; $('campaignStory').value=data.story;
     $('campaignGoal').value=data.goal; $('campaignDays').value=data.duration_days;
     $('campaignReward').value=data.reward||''; $('campaignCategory').value=data.category;
+    window.launchglassCampaignImageUrl=data.image_url||null;
+    if($('campaignImagePreview')){$('campaignImagePreview').src=data.image_url||'';$('campaignImagePreview').hidden=!data.image_url;}
     location.hash='#campaign-builder'; notify('Draft loaded into the campaign builder.');
   }));
   document.querySelectorAll('[data-delete-idea]').forEach(button=>button.addEventListener('click',async()=>{

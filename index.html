@@ -1672,6 +1672,14 @@ textarea.inputField{min-height:110px;resize:vertical}
    <div class="grid2"><input class="inputField" id="campaignGoal" type="number" min="1" placeholder="Funding goal (₹)"><input class="inputField" id="campaignDays" type="number" min="1" max="90" placeholder="Duration (days)"></div>
    <input class="inputField" id="campaignReward" placeholder="Early supporter reward (e.g. product at ₹3,499)">
    <select class="inputField" id="campaignCategory"><option value="">Choose category</option><option>Technology</option><option>Electronics</option><option>Smart Gadgets</option><option>Fashion</option><option>Sustainability</option><option>Gaming</option><option>Lifestyle</option><option>Creative Products</option></select>
+
+   <div class="campaignImageUpload">
+    <label class="mono" for="campaignImage">PRODUCT COVER · JPG / PNG / WEBP · MAX 5 MB</label>
+    <input id="campaignImage" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+    <div class="actionRow"><button class="btn" id="uploadCampaignImage" type="button">Choose & upload image</button><span class="mono">Campaign cover image</span></div>
+    <img id="campaignImagePreview" alt="Campaign cover preview" hidden style="max-width:220px;max-height:150px;object-fit:cover;border-radius:14px;margin-top:12px">
+   </div>
+
    <div class="actionRow"><button class="btn" id="generateCampaignCopy" type="button">Write campaign story with Gemini</button><button class="btn" id="previewCampaign" type="button">Preview ↗</button><button class="btn primary" id="saveCampaign" type="button">Save draft</button><button class="btn primary" id="submitCampaign" type="button">Submit for review</button></div><div class="resultBox" id="campaignResult"></div>
   </div>
   <div class="infoCard"><h3>Campaign media & settings</h3><p>Creator media uploads and advanced reward inventory are future upgrades. Draft creation, submission and owner approval are connected.</p>
@@ -1686,7 +1694,20 @@ textarea.inputField{min-height:110px;resize:vertical}
 <section class="wrap section" id="my-workspace">
  <div class="sectionHead"><div><div class="mono">/ YOUR PRIVATE SPACE</div><h2>My <span class="script">workspace.</span></h2></div><p>Your saved ideas, campaign drafts and expressions of interest. Only your account and platform admins can access your private records.</p></div>
  <div class="grid2">
-  <div class="workspacePanel"><div class="panelTop"><h3>Saved ideas</h3><button class="btn" id="exportMyData" type="button">Export my data ↓</button></div><div id="myIdeas" class="workspaceList"><p class="mono">Loading your ideas…</p></div></div>
+ 
+ <div class="workspacePanel" id="my-profile-panel">
+  <div class="panelTop"><h3>Your profile</h3><span class="statusPill">Private account</span></div>
+  <p class="mono" id="profileEmail"></p>
+  <div class="grid2">
+   <input class="inputField" id="profileFullName" maxlength="120" placeholder="Display name">
+   <select class="inputField" id="profileType"><option value="creator">Creator</option><option value="supporter">Supporter</option><option value="manufacturer">Manufacturer</option></select>
+  </div>
+  <textarea class="inputField" id="profileBio" maxlength="500" placeholder="Short bio (up to 500 characters)"></textarea>
+  <input class="inputField" id="profileWebsite" type="url" placeholder="Website URL (https://...)">
+  <button class="btn primary" id="saveProfile" type="button">Save profile</button>
+ </div>
+
+ <div class="workspacePanel"><div class="panelTop"><h3>Saved ideas</h3><button class="btn" id="exportMyData" type="button">Export my data ↓</button></div><div id="myIdeas" class="workspaceList"><p class="mono">Loading your ideas…</p></div></div>
   <div class="workspacePanel"><h3>Campaign drafts & submissions</h3><div id="myCampaigns" class="workspaceList"><p class="mono">Loading your campaigns…</p></div></div>
  </div>
  <div class="workspacePanel"><h3>Saved AI documents</h3><div id="myAIDocuments" class="workspaceList"><p class="mono">Loading your AI documents…</p></div></div>
