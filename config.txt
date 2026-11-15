@@ -1,0 +1,8 @@
+// Launchglass Supabase configuration
+// Replace the placeholder with your Supabase Publishable key.
+// Do NOT use the Secret or service_role key in this frontend file.
+
+window.LAUNCHGLASS_CONFIG = {
+  SUPABASE_URL: 'https://flmusluobygrippbmagl.supabase.co',
+  SUPABASE_ANON_KEY: 'sb_publishable_EXDbgJClYzI6_-k5GUybvw_QlYQl5Et'
+};
